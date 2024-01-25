@@ -1,0 +1,45 @@
+{
+  "name": "ksdoc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "publish": "npm login && npm publish",
+    "type": "npx -p typescript tsc ./index.js --target ES2022 --module commonjs --declaration --allowJs --checkJs --emitDeclarationOnly --outDir types"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ameksike/ksdoc.git"
+  },
+  "keywords": [
+    "website",
+    "Document",
+    "API",
+    "Ksike"
+  ],
+  "author": {
+    "name": "Antonio Membrides Espinosa",
+    "email": "tonykssa@gmail.com",
+    "url": "https://github.com/ameksike"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ameksike/ksdoc/issues"
+  },
+  "homepage": "https://github.com/ameksike/ksdoc#readme",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "jest": "^26.6.3",
+    "jsdoc": "^4.0.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "ksdp": "^1.2.16",
+    "ksmf": "^1.2.41",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  }
+}

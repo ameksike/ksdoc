@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "node",
+            "request": "launch",
+            "env": {
+                "CI": "true"
+            },
+            "args": [
+                "test",
+                "--runInBand",
+                "--no-cache"
+            ],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/jest"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "CURRENT",
+            "args": [
+                "test",
+                "--verbose",
+                "--t",
+                "${file}"
+            ],
+            "env": {
+                "NODE_ENV": "local"
+            },
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "program": "${workspaceRoot}/node_modules/.bin/jest"
+        }
+    ]
+}
