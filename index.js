@@ -1,4 +1,4 @@
-const Document = require('./src/Document');
+const Document = require('./src/controller/Document');
 
 const path = require('path');
 

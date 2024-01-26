@@ -1,14 +1,20 @@
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
 const ksmf = require('ksmf');
 const ksdp = require('ksdp');
-const fs = require('fs');
-const fsp = fs.promises;
 const path = require('path');
+
 const utl = ksmf.app.Utl.self();
 const uri = ksmf.app.Url.self();
 
+const ContentManager = require('../service/ContentManager');
+const SwaggerManager = require('../service/SwaggerManager');
+
 class Documentor extends ksdp.integration.Dip {
+
+    /**
+     * @description middleware
+     * @type {Console|null}
+     */
+    formData = null;
 
     /**
      * @type {Console|null}
@@ -25,9 +31,18 @@ class Documentor extends ksdp.integration.Dip {
      */
     authorizationService = null;
 
+    /**
+     * @type {ContentManager|null}
+     */
+    contentManager = null;
+
     constructor() {
         super();
-        this.serve = swaggerUi.serve;
+
+        this.contentManager = new ContentManager();
+        this.swaggerManager = new SwaggerManager();
+
+
         this.path = path.join(__dirname, '../../../docs');
 
         this.route = '/doc';
@@ -71,22 +86,6 @@ class Documentor extends ksdp.integration.Dip {
      */
     init(app, cfg) {
         this.cfg = cfg || this.cfg;
-        const topics = this.menu.topics || path.join(this.path, this.keys.topics);
-        const metadata = this.content.getDataSync({ name: this.keys.description }) || {};
-
-        this.cfg.swaggerDefinition.tags = this.loadTopics(topics);
-        this.cfg.swaggerDefinition.info.version = metadata.version;
-        this.cfg.swaggerDefinition.info.description = this.tplHandler.compile(
-            path.join(this.path, this.keys.description + this.exts),
-            metadata
-        );
-
-        const swaggerSpec = swaggerJSDoc(this.cfg);
-        const delegate = swaggerUi.setup(swaggerSpec, {
-            explorer: false,
-            customCssUrl: this.css,
-            customJs: this.js
-        });
 
         if (app.use) {
             app.use("*.css", (req, res, next) => res.set('Content-Type', 'text/css') && next());
@@ -99,58 +98,9 @@ class Documentor extends ksdp.integration.Dip {
             app.get(this.view + "/:id", (req, res) => this.show(req, res));
             app.get(this.view, this.session?.check(this.viewAccess, this.sessionKey, 'simple'), (req, res) => this.show(req, res));
             app.post(this.view, this.formData?.support(), (req, res) => this.save(req, res));
-            app.use(this.route, this.session?.check(this.viewAccess, this.sessionKey, 'simple'), this.serve, delegate);
+
+            this.swaggerManager.init(app, this.cfg);
         }
-    }
-
-    /**
-     * 
-     * @param {String} source 
-     * @returns {{ name: String; description: String}}
-     */
-    loadTopics(source) {
-        return this.getTopics(source, (item, i, source) => {
-            let route = typeof source === "string" ? source : path.join(this.path, item.path);
-            return {
-                name: item.title || i + 1,
-                description: this.tplHandler.compile(path.join(route, item.name))
-            }
-        });
-    }
-
-    /**
-     * @description laod the main manu
-     * @param {String} source 
-     * @param {*} [type] 
-     * @param {*} [url] 
-     * @param {*} [pos] 
-     * @returns 
-     */
-    loadMenu(source, type = null, url = null, pos = "") {
-        type = type || this.keys.pages;
-        url = url || this.view;
-        source = typeof source === "string" ? path.join(source, type) : source;
-        return this.getTopics(source, item => {
-            let title = item.name.replace(/\.[a-zA-Z0-9]+$/, "");
-            let group = item.group || type;
-            return {
-                url: `${url}/${group}/${title}` + pos,
-                title: title.replace(/^\d+\-/, "")
-            };
-        });
-    }
-
-    /**
-     * @description get the list of topics to the menu
-     * @param {Array<String>|String} source 
-     * @param {Function} [render] 
-     * @returns {Object}
-     */
-    getTopics(source, render) {
-        const dir = Array.isArray(source) ? source : fs.readdirSync(source, { withFileTypes: true });
-        return dir
-            .filter(item => (item.isDirectory && !item.isDirectory()) || !item.isDirectory)
-            .map((item, i) => render ? render(item, i, source) : item.name);
     }
 
     /**
@@ -195,7 +145,6 @@ class Documentor extends ksdp.integration.Dip {
     async save(req, res) {
         let params = utl.getFrom(req)
         let { content, title = "default", index, type = this.keys.pages, id } = params;
-        let source = path.join(this.path, type);
         if (!content) {
             return res.status(400).send({
                 success: false,
@@ -203,21 +152,12 @@ class Documentor extends ksdp.integration.Dip {
             });
         }
         try {
-            if (!id) {
-                if (!index) {
-                    let dirs = await fsp.readdir(source, { withFileTypes: true });
-                    index = (dirs?.length || 0) + 1;
-                }
-                index = utl.padSrt(index, 2);
-                id = index + "-" + title;
-            }
-            const filename = path.join(source, id.replace(/\s/g, "-") + this.exts);
+            const filename = await this.contentManager?.save({ path: this.path, id, index, title, type, content });
             this.logger?.info({
                 flow: req.flow,
                 src: "service:doc:save",
                 data: { filename }
             });
-            await fsp.writeFile(filename, content);
             res.send({ success: true, msg: "SAVE_OK", data: { page: type + "/" + id } });
         }
         catch (error) {
@@ -248,8 +188,7 @@ class Documentor extends ksdp.integration.Dip {
                     msg: "E_BAD_REQUEST",
                 });
             }
-            let filename = path.join(this.path, type, id + this.exts);
-            await fsp.unlink(filename, { withFileTypes: true });
+            let filename = await this.contentManager?.delete({ id, type, exts: this.exts, path: this.path });
             this.logger?.info({
                 flow: req.flow,
                 src: "service:doc:delete",
@@ -306,13 +245,14 @@ class Documentor extends ksdp.integration.Dip {
             res.status(500).send({
                 success: false,
                 msg: "E_BAD_REQUEST",
-            })
+            });
         }
     }
 
     /**
      * @description login action
      * @param {Request} req 
+     * @param {String} [req.flow] 
      * @param {Response} res 
      */
     async login(req, res) {
@@ -359,6 +299,12 @@ class Documentor extends ksdp.integration.Dip {
         }
     }
 
+    /**
+     * 
+     * @param {Object} req 
+     * @param {String} [req.flow] 
+     * @param {Object} res 
+     */
     async logout(req, res) {
         try {
             this.session?.remove(req, this.sessionKey);
