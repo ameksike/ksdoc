@@ -34,11 +34,7 @@
                 <a class="nav-link" href="{{url.api}}">API Docs</a>
                 <a class="nav-link" href="{{url.src}}">SRC Docs</a>
 
-                {% for item in topics %}
-                <a class="nav-link" href="{{item.url}}">{{item.title}}</a>
-                {% endfor %}
-
-                {% for item in pages %}
+                {% for item in menu %}
                 <a class="nav-link" href="{{item.url}}">{{item.title}}</a>
                 {% endfor %}
             </nav>
