@@ -25,12 +25,12 @@ class SwaggerManager extends ksdp.integration.Dip {
     constructor() {
         super();
         this.serve = swaggerUi.serve;
+        this.cfg = { swaggerDefinition: { tags: [], info: { version: '', description: '' } } };
+
+
         this.path = path.join(__dirname, '../../../docs');
-
         this.route = '/doc';
-
         this.exts = '.html';
-        this.cfg = {};
 
         this.js = [];
         this.css = [];
@@ -46,10 +46,11 @@ class SwaggerManager extends ksdp.integration.Dip {
         this.route = configDoc?.route || this.route;
         this.exts = configDoc?.exts || this.exts;
         this.cfg = configDoc?.swagger || this.cfg;
-        this.js = configDoc?.js || this.js;
-        this.css = configDoc?.css || this.css;
         this.keys = configDoc?.keys || this.keys;
         this.menu = configDoc?.menu || this.menu;
+
+        this.js = configDoc?.js || this.js;
+        this.css = configDoc?.css || this.css;
         return this;
     }
 

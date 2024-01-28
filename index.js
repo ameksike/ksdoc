@@ -82,7 +82,18 @@ const KsDoc = {
         return KsDoc;
     },
     driver: {
-        Document
+        controller: {
+            Document,
+            default: Document
+        },
+        service: {
+            Content: require('./src/service/ContentManager'),
+            Api: require('./src/service/SwaggerManager'),
+        },
+        middleware: {
+            Session: require('./src/middleware/Session'),
+            FormData: require('./src/middleware/FormData'),
+        }
     }
 };
 

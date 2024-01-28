@@ -75,8 +75,52 @@ class ContentManager {
         return filename;
     }
 
-    select() {
+    async select({ pageid, typeid, flow, token, account }) {
+        let atoken = token ? "?token=" + token : "";
 
+        let content = !pageid ? '' : await this.tplHandler.render(
+            path.join(this.path, typeid, pageid + this.exts),
+            await this.content.getData({ name: pageid, flow, token })
+        );
+
+        content = content || await this.tplHandler.render(
+            path.join(this.path, typeid, "../" + this.keys.main + this.exts),
+            await this.content.getData({ name: this.keys.main, flow, token })
+        ) || "";
+
+        let topics = this.loadMenu(this.path, this.keys.topics, null, atoken);
+        let pages = this.menu?.pages === false ? "" : this.loadMenu(this.path, this.keys?.pages, null, atoken);
+
+        return this.renderLayout({ content, topics, pages, account, token });
+    }
+
+    /**
+     * @description build layout page
+     * @param {Object} payload 
+     * @returns {Promise<String>}
+     */
+    renderLayout(payload = {}) {
+        const { content = "", topics, pages, account, scripts = "", styles = "", title = "Auth API Doc" } = payload || {};
+        return this.tplHandler.render(
+            path.join(this.path, this.keys.layout + this.exts),
+            {
+                content,
+                topics,
+                pages,
+                account: {
+                    name: account?.user?.firstName || "Guest"
+                },
+                url: {
+                    logout: this.viewLogout,
+                    api: "/doc",
+                    src: "/src"
+                },
+                token,
+                scripts,
+                styles,
+                title
+            }
+        );
     }
 
 }

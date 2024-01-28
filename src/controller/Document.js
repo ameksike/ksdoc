@@ -1,6 +1,7 @@
 const ksmf = require('ksmf');
 const ksdp = require('ksdp');
 const path = require('path');
+const kstpl = require('kstpl');
 
 const utl = ksmf.app.Utl.self();
 const uri = ksmf.app.Url.self();
@@ -36,11 +37,16 @@ class Documentor extends ksdp.integration.Dip {
      */
     contentManager = null;
 
+    /**
+     * @type {SwaggerManager|null}
+     */
+    apiManager = null;
+
     constructor() {
         super();
 
         this.contentManager = new ContentManager();
-        this.swaggerManager = new SwaggerManager();
+        this.apiManager = new SwaggerManager();
 
 
         this.path = path.join(__dirname, '../../../docs');
@@ -58,7 +64,7 @@ class Documentor extends ksdp.integration.Dip {
         this.viewAccess = this.view + '/auth/access';
         this.viewLogin = this.view + '/auth/login';
         this.viewLogout = this.view + '/auth/logout';
-        this.tplHandler = new ksmf.view.Tpl();
+        this.tplHandler = kstpl;
     }
 
     setting(configDoc) {
@@ -99,7 +105,7 @@ class Documentor extends ksdp.integration.Dip {
             app.get(this.view, this.session?.check(this.viewAccess, this.sessionKey, 'simple'), (req, res) => this.show(req, res));
             app.post(this.view, this.formData?.support(), (req, res) => this.save(req, res));
 
-            this.swaggerManager.init(app, this.cfg);
+            this.apiManager.init(app, this.cfg);
         }
     }
 
@@ -113,27 +119,8 @@ class Documentor extends ksdp.integration.Dip {
         let pageid = req.params.id || "";
         let typeid = req.params.type || this.keys.pages;
         let ttoken = this.session?.getToken(req);
-        let atoken = ttoken ? "?token=" + ttoken : "";
-        let content = !pageid ? '' : await this.tplHandler.render(
-            path.join(this.path, typeid, pageid + this.exts),
-            await this.content.getData({ name: pageid, flow: req.flow, token: ttoken })
-        );
-        content = content || await this.tplHandler.render(
-            path.join(this.path, typeid, "../" + this.keys.main + this.exts),
-            await this.content.getData({ name: this.keys.main, flow: req.flow, token: ttoken })
-        ) || "";
-        let topics = this.loadMenu(this.path, this.keys.topics, null, atoken);
-        let pages = this.menu?.pages === false ? "" : this.loadMenu(this.path, this.keys?.pages, null, atoken);
-        let layout = await this.tplHandler.render(
-            path.join(this.path, this.keys.layout + this.exts),
-            {
-                content, topics, pages, account: {
-                    name: account?.user?.firstName || "Guest"
-                },
-                logout: this.viewLogout,
-                token: ttoken
-            }
-        );
+
+        let layout = await this.contentManager.select({ account, pageid, typeid, token: ttoken });
         res.send(layout);
     }
 
@@ -155,7 +142,7 @@ class Documentor extends ksdp.integration.Dip {
             const filename = await this.contentManager?.save({ path: this.path, id, index, title, type, content });
             this.logger?.info({
                 flow: req.flow,
-                src: "service:doc:save",
+                src: "KsDoc:save",
                 data: { filename }
             });
             res.send({ success: true, msg: "SAVE_OK", data: { page: type + "/" + id } });
@@ -163,7 +150,7 @@ class Documentor extends ksdp.integration.Dip {
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "service:doc:save",
+                src: "KsDoc:save",
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
@@ -191,7 +178,7 @@ class Documentor extends ksdp.integration.Dip {
             let filename = await this.contentManager?.delete({ id, type, exts: this.exts, path: this.path });
             this.logger?.info({
                 flow: req.flow,
-                src: "service:doc:delete",
+                src: "KsDoc:delete",
                 data: { filename }
             });
             res.send({ success: true, msg: "DELETE_OK", data: { page: type + "/" + id } });
@@ -199,7 +186,7 @@ class Documentor extends ksdp.integration.Dip {
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "service:doc:delete",
+                src: "KsDoc:delete",
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
@@ -237,7 +224,7 @@ class Documentor extends ksdp.integration.Dip {
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "service:doc:access",
+                src: "KsDoc:access",
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
@@ -261,7 +248,7 @@ class Documentor extends ksdp.integration.Dip {
                 throw new Error("Incorrect Grant Type");
             }
             let mode = req.query.mode;
-            let payload = await this.authorizationService?.getROPCredentials({
+            let payload = await this.authorizationService?.check({
                 client_id: req.body.client_id,
                 client_secret: req.body.client_secret,
                 username: req.body.username,
@@ -278,7 +265,7 @@ class Documentor extends ksdp.integration.Dip {
             let rurl = sess?.originalUrl || req.query.redirectUrl || this.view;
             this.logger?.info({
                 flow: req.flow,
-                src: "service:doc:login",
+                src: "KsDoc:login",
                 data: { rurl }
             });
             if (mode === "in") {
@@ -291,7 +278,7 @@ class Documentor extends ksdp.integration.Dip {
             let urlr = uri.add(this.viewAccess, { msg: "Invalid user" }, req);
             this.logger?.error({
                 flow: req.flow,
-                src: "service:doc:login",
+                src: "KsDoc:login",
                 error: { message: error?.message || error, stack: error?.stack },
                 data: { ...req.body, redirect: urlr }
             });
@@ -313,7 +300,7 @@ class Documentor extends ksdp.integration.Dip {
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "service:doc:logout",
+                src: "KsDoc:logout",
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
