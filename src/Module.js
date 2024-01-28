@@ -85,10 +85,10 @@ class DocumentModule extends ksdp.integration.Dip {
         this.path = {
             root: path.join(__dirname, '../../../doc'),
             config: path.join(__dirname, '../../../doc'),
+            resource: path.join(__dirname, '../../../doc'),
             // partials
             page: 'page',
             cache: 'cache',
-            resource: 'resource',
         };
         this.route = {
             root: '/doc',
@@ -135,23 +135,24 @@ class DocumentModule extends ksdp.integration.Dip {
     /**
      * 
      * @param {Object} [app] 
+     * @param {Function|null} [publish] 
      * @param {Object|null} [cfg] 
      */
-    init(app, cfg = null) {
+    init(app, publish, cfg = null) {
         this.cfg = cfg || this.cfg;
-
         if (typeof app?.use !== "function" || typeof app?.post !== "function") {
             return this;
         }
         const mdCheck = this.session?.check(this.route.access, this.sessionKey, 'simple');
         const mdFormData = this.formData?.support();
-        // global url 
+        // Resources URL
         app.use("*.css", (req, res, next) => res.set('Content-Type', 'text/css') && next());
+        publish instanceof Function && app.use(publish(this.path.resource));
+        // Security URL
         app.get(this.route.access, (req, res) => this.controller.access(req, res));
         app.post(this.route.login, (req, res) => this.controller.login(req, res));
         app.get(this.route.logout, (req, res) => this.controller.logout(req, res));
-
-        // scheme url 
+        // Scheme URL 
         app.get(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.show(req, res));
         app.delete(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.delete(req, res));
         app.post(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));

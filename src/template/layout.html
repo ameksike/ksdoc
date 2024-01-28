@@ -18,10 +18,12 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/doc">Auth API DOC</a>
+            <a class="navbar-brand" href="{{url.home}}">{{title}}</a>
         </div>
         <div class="container-fluid justify-content-end">
-            <span class="navbar-brand"> Welcome: <a class="navbar-brand" href="/doc"> {{account.name}}</a> </span>
+            <span class="navbar-brand"> Welcome: <a class="navbar-brand" href="{{url.home}}">
+                    {{account.name}}</a>
+            </span>
             <a class="btn btn-outline-success " href="{{url.logout}}">Exit</a>
         </div>
     </nav>
@@ -30,7 +32,7 @@
 
         <div class="row">
             <nav class="nav nav-underline flex-column col-lg-2 col-sm-12">
-                <a class="nav-link" href="/doc/view?token={{token}}">Home</a>
+                <a class="nav-link" href="{{url.home}}">Home</a>
                 <a class="nav-link" href="{{url.api}}">API Docs</a>
                 <a class="nav-link" href="{{url.src}}">SRC Docs</a>
 

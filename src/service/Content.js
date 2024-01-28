@@ -53,56 +53,6 @@ class ContentService extends ksdp.integration.Dip {
      */
     template = null;
 
-    /**
-     * 
-     * @param {String} source 
-     * @returns {{ name: String; description: String}}
-     */
-    loadTopics(source) {
-        return this.getTopics(source, (item, i, source) => {
-            let route = typeof source === "string" ? source : _path.join(this.path, item.path);
-            return {
-                name: item.title || i + 1,
-                description: this.tplService.compile(_path.join(route, item.name))
-            }
-        });
-    }
-
-    /**
-     * @description laod the main manu
-     * @param {String} source 
-     * @param {*} [type] 
-     * @param {*} [url] 
-     * @param {*} [pos] 
-     * @returns 
-     */
-    loadMenu(source, type = null, url = null, pos = "") {
-        type = type || this.keys.pages;
-        url = url || this.view;
-        source = typeof source === "string" ? _path.join(source, type) : source;
-        return this.getTopics(source, item => {
-            let title = item.name.replace(/\.[a-zA-Z0-9]+$/, "");
-            let group = item.group || type;
-            return {
-                url: `${url}/${group}/${title}` + pos,
-                title: title.replace(/^\d+\-/, "")
-            };
-        });
-    }
-
-    /**
-     * @description get the list of topics to the menu
-     * @param {Array<String>|String} source 
-     * @param {Function} [render] 
-     * @returns {Object}
-     */
-    getTopics(source, render) {
-        const dir = Array.isArray(source) ? source : _fs.readdirSync(source, { withFileTypes: true });
-        return dir
-            .filter(item => (item.isDirectory && !item.isDirectory()) || !item.isDirectory)
-            .map((item, i) => render ? render(item, i, source) : item.name);
-    }
-
     async delete({ path, type, id, exts }) {
         let filename = _path.join(path, type, id + exts);
         await _fsp.unlink(filename, { withFileTypes: true });
@@ -124,37 +74,39 @@ class ContentService extends ksdp.integration.Dip {
         return filename;
     }
 
-    searchTpl({ pageid }) {
+
+    searchTpl({ pageid, path }) {
         let ext = ".html";
-        let path = this.template[pageid]
-        let file = path || pageid + ext;
-        return { file, path };
+        let tpl = this.template[pageid];
+        return {
+            exist: !!tpl,
+            name: tpl ? _path.basename(tpl) : pageid,
+            path: tpl ? _path.dirname(tpl) : path,
+            ext
+        };
     }
 
-    async getContent({ pageid, flow, token, path }) {
-        if (!pageid) {
+    async getContent({ pageid, flow, token, path, page }) {
+        if (!pageid && page) {
             return '';
         }
-        this.tplService?.configure({ ext: "", path });
-        let pageMeta = this.searchTpl({ pageid });
-        let pageOption = { absolute: !!pageMeta.path };
-        let pageData = await this.dataService?.getData({ name: pageid, flow, token });
-        let content = await this.tplService.render(pageMeta.file, pageData, pageOption);
+        page = page || this.searchTpl({ pageid, path });
+        let pageOption = { path: page.path, ext: page.ext };
+        let pageData = await this.dataService?.getData({ name: page.name, flow, token });
+        let content = await this.tplService.render(page.name, pageData, pageOption);
         return content;
     }
 
     async select(payload) {
         const { pageid, scheme, flow, token, account } = payload || {};
         let path = _path.join(this.path.root, scheme, this.path.page);
-
-        let content = await this.getContent({ pageid, flow, token, path });
+        let page = this.searchTpl({ pageid, path });
+        let [content, menu] = await Promise.all(
+            this.getContent({ pageid, flow, token, path, page }),
+            !pageMeta.exist ? this.loadMenu({ scheme, url: this.route.root }) : Promise.resolve([])
+        );
         content = content || await this.getContent({ pageid: "main", flow, token, path });
-
-        let atoken = token ? "?token=" + token : "";
-        let topics = this.loadMenu(this.path, this.keys.topics, null, atoken);
-        let pages = this.menu?.pages === false ? "" : this.loadMenu(this.path, this.keys?.pages, null, atoken);
-
-        return this.renderLayout({ content, topics, pages, account, token });
+        return pageMeta.exist ? content : this.renderLayout({ content, scheme, menu, account, token });
     }
 
     /**
@@ -163,27 +115,63 @@ class ContentService extends ksdp.integration.Dip {
      * @returns {Promise<String>}
      */
     renderLayout(payload = {}) {
-        const { content = "", topics, pages, account, scripts = "", styles = "", title = "Auth API Doc" } = payload || {};
+        const { content = "", menu, scheme = "view", account, scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
         return this.tplService.render(
             _path.join(this.path, this.keys.layout + this.exts),
             {
+                menu,
+                title,
+                token,
+                styles,
+                scripts,
                 content,
-                topics,
-                pages,
                 account: {
                     name: account?.user?.firstName || "Guest"
                 },
                 url: {
-                    logout: this.viewLogout,
-                    api: "/doc",
-                    src: "/src"
-                },
-                token,
-                scripts,
-                styles,
-                title
+                    access: this.route.access,
+                    logout: this.route.logout,
+                    home: this.route.root + "/" + scheme,
+                    api: this.route.root + "/" + scheme + this.route.api,
+                    src: this.route.root + "/" + scheme + this.route.src
+                }
             }
         );
+    }
+
+    /**
+     * @description laod the main manu
+     * @param {String} source 
+     * @param {*} [type] 
+     * @param {*} [url] 
+     * @param {*} [pos] 
+     * @returns 
+     */
+    loadMenu({ scheme, url = null, source, type = null, pos = "" }) {
+        type = type || this.keys.pages;
+
+        source = typeof source === "string" ? _path.join(source, type) : source;
+        return this.loadFrmFS(source, item => {
+            let title = item.name.replace(/\.[a-zA-Z0-9]+$/, "");
+            let group = item.group || type;
+            return {
+                url: `${url}/${group}/${title}` + pos,
+                title: title.replace(/^\d+\-/, "")
+            };
+        });
+    }
+
+    /**
+     * @description get the list of topics to the menu
+     * @param {Array<String>|String} source 
+     * @param {Function} [render] 
+     * @returns {Object}
+     */
+    async loadFrmFS(source, render) {
+        const dir = Array.isArray(source) ? source : await _fsp.readdir(source, { withFileTypes: true });
+        return dir
+            .filter(item => (item.isDirectory && !item.isDirectory()) || !item.isDirectory)
+            .map((item, i) => render instanceof Function ? render(item, i, source) : item.name);
     }
 
 }
