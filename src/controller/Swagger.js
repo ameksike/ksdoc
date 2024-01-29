@@ -3,7 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 
 const ksdp = require('ksdp');
 const path = require('path');
-const TCfg = require('ksdocs/src/types');
+const utl = require('../utl');
 
 class SwaggerController extends ksdp.integration.Dip {
 
@@ -25,7 +25,7 @@ class SwaggerController extends ksdp.integration.Dip {
     constructor() {
         super();
         this.serve = swaggerUi.serve;
-        this.cfg = { ...TCfg };
+        this.cfg = null;
     }
 
     /**
@@ -33,7 +33,7 @@ class SwaggerController extends ksdp.integration.Dip {
      * @param {Object} option 
      * @returns {SwaggerController} self
      */
-    setting(option) {
+    configure(option) {
         return typeof option === "object" ? this.inject(option) : this;
     }
 
@@ -42,27 +42,29 @@ class SwaggerController extends ksdp.integration.Dip {
      * @returns {Array} midllewares
      */
     init(cfg = null) {
-        this.cfg = cfg || this.cfg || { ...TCfg };
-        this.cfg.swaggerDefinition.tags = this.loadTags(this.cfg?.topics);
-        this.cfg.swaggerDefinition.info.version = metadata.version;
-        this.cfg.swaggerDefinition.info.description = this.loadDescription();
+        const metadata = this.content?.getDataSync({ name: this.keys.description }) || {};
 
-        const swaggerSpec = swaggerJSDoc(this.cfg);
+        cfg = cfg || this.cfg;
+        cfg.swaggerDefinition.tags = this.loadTags(cfg?.topics, metadata);
+        cfg.swaggerDefinition.info.version = metadata.version || cfg.swaggerDefinition.info.version;
+        cfg.swaggerDefinition.info.description = this.loadDescription(metadata) || cfg.swaggerDefinition.info.description;
+        Array.isArray(cfg.apis) && (cfg.apis = cfg.apis.map(item => utl.interpolate(item, { api: this.path.root })));
+
+        const swaggerSpec = swaggerJSDoc(cfg);
         const delegate = swaggerUi.setup(swaggerSpec, {
             explorer: false,
-            customCssUrl: this.cfg.css,
-            customJs: this.cfg.js
+            customCssUrl: cfg.css,
+            customJs: cfg.js
         });
 
         return [this.serve, delegate];
     }
 
-    loadTags(topics) {
+    loadTags(topics, metadata) {
         return [];
     }
 
-    loadDescription() {
-        const metadata = this.content?.getDataSync({ name: this.keys.description }) || {};
+    loadDescription(metadata = {}) {
         return this.template?.description ? this.tplHandler?.compile(
             path.join(this.template?.description),
             metadata

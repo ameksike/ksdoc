@@ -26,3 +26,19 @@ This library belong to the Ksike ecosystem:
 
 KsDoc stands out as a valuable addition to the Ksike ecosystem, offering developers an efficient and unified solution for documentation needs across diverse application types. With support for CLI, web, and API documentation, seamless integration with Swagger and JSDoc, and an emphasis on intuitive processes, KsDoc empowers developers to create well-documented and user-friendly applications.
 
+
+## Quick overview
+```Js
+const express = require("express");
+const ksdocs = require("ksdocs");
+
+const app = express();
+
+ksdocs.configure({
+    path: {
+        root: __dirname + "/docs"
+    }
+}).init(app, express.static)
+
+app.listen(5555);
+```

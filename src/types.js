@@ -22,7 +22,7 @@ function build(cls, args = []) {
     return new cls(...args);
 }
 
-const config = {
+const TConfig = {
     swaggerDefinition: {
         openapi: '3.0.1',
         tags: [],
@@ -45,10 +45,10 @@ const config = {
         }]
     },
     apis: [
-        './**/*.yml',
-        './**/*.json',
-        './**/*.ts',
-        './**/*.js'
+        '{api}/**/*.yml',
+        '{api}/**/*.json',
+        '{api}/**/*.ts',
+        '{api}/**/*.js'
     ],
     js: [],
     css: [],
@@ -57,5 +57,5 @@ const config = {
 
 module.exports = {
     build,
-    config
+    TConfig
 };
