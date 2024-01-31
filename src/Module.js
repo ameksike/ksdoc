@@ -78,11 +78,10 @@ class DocumentModule extends ksdp.integration.Dip {
         this.path = {
             root: path.join(__dirname, '../../../docs'),
             // partials
-            content: '{root}/content',
-            resource: '{root}/resource',
-            page: '{content}/{scheme}/page',
-            cache: '{content}/{scheme}/cache',
-            config: '{content}/{scheme}/config',
+            resource: '{root}/{scheme}/resource',
+            page: '{root}/{scheme}/page',
+            cache: '{root}/{scheme}/cache',
+            config: '{root}/{scheme}/config',
         };
         this.route = {
             root: '/doc',
@@ -92,7 +91,7 @@ class DocumentModule extends ksdp.integration.Dip {
             logout: '{root}/auth/logout',
             access: '{root}/auth/access',
             // partials
-            public: '{resource}/{scheme}/',
+            public: '{resource}/{scheme}',
             home: '{root}/{scheme}',
             pag: '{root}/{scheme}/{page}',
             api: '{root}/{scheme}/api',
@@ -169,7 +168,11 @@ class DocumentModule extends ksdp.integration.Dip {
         this.apiController?.configure({ cfg: this.cfg, path: this.path });
         // Resources URL
         app.use("*.css", (req, res, next) => res.set('Content-Type', 'text/css') && next());
-        publish instanceof Function && app.use(this.route.resource, publish(utl.mix(this.path.resource, this.path)));
+        publish instanceof Function && app.use(utl.mix(this.route.public, { ...this.route, scheme: ":scheme" }), (req, res, next) => {
+            const scheme = req.params.scheme;
+            const resouce = path.resolve(utl.mix(this.path.resource, { ...this.path, scheme }));
+            publish(resouce)(req, res, next);
+        });
         // Security URL
         app.get(utl.mix(this.route.login, this.route), (req, res) => this.controller.login(req, res));
         app.get(utl.mix(this.route.logout, this.route), (req, res) => this.controller.logout(req, res));
