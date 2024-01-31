@@ -74,11 +74,14 @@ a:active {
 .roadmap {
     margin-top: 20px;
 }
+/* highlight.js */
+pre>code{
+    border-radius: 10px;
+}
 /* global */
 p {
     margin-top: 0.5rem;
 }
-
 .bad-number {
     background-color: rgba(176, 14, 14, 0.349);
     border-radius: 10px;
@@ -86,7 +89,6 @@ p {
     color: black;
     display: inline !important;
 }
-
 .hide {
     display: none;
 }
