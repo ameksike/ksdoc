@@ -1,25 +1,16 @@
 
+const KsTpl = require("kstpl");
 module.exports = {
 
     /**
      * @description string interpolation 
      * @param {String} str 
-     * @param {Object} option 
+     * @param {Object} data 
      * @param {String} open 
      * @param {String} close 
      * @returns {String} string
      */
-    interpolate(str, option, open = "{", close = "}") {
-        if (!str) {
-            return "";
-        }
-        if (!option) {
-            return str;
-        }
-        for (let i in option) {
-            str = str.replace(new RegExp(open + i + close, "g"), option[i]);
-        }
-        return str;
+    mix(str, data, open = "{", close = "}") {
+        return KsTpl.compile(str, data, { driver: "str", openDelimiter: open, closeDelimiter: close, deep: true });
     }
-
 };

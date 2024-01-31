@@ -76,26 +76,27 @@ class ContentService extends ksdp.integration.Dip {
     }
 
     searchTpl({ pageid, path, scheme }) {
-        let tpl = utl.interpolate(this.template[pageid], { scheme, root: this.path.root });
+        let route = { ...this.path, scheme };
+        let tpl = utl.mix(this.template[pageid], route);
         let isFragment = !tpl || /snippet\..*/.test(tpl);
-        let ext = !isFragment ? "" : "html";
+        let ext = !isFragment || !!tpl ? "" : "html";
         return {
             exist: !!tpl,
             isFragment,
             name: tpl ? _path.basename(tpl) : pageid,
-            path: tpl ? _path.dirname(tpl) : utl.interpolate(path, { scheme, root: this.path.root }),
+            path: tpl ? _path.dirname(tpl) : utl.mix(path, route),
             ext
         };
     }
 
-    async getContent({ pageid, flow, token, page, path, scheme }) {
+    async getContent({ pageid, flow, token, page, path, scheme, data }) {
         if (!pageid && page) {
             return '';
         }
         page = page || this.searchTpl({ pageid, path, scheme });
         let pageOption = { path: page.path, ext: page.ext };
         let pageData = await this.dataService?.getData({ name: page.name, flow, token });
-        let content = await this.tplService.render(page.name, pageData || {}, pageOption);
+        let content = await this.tplService.render(page.name, { ...data, ...pageData }, pageOption);
         return content;
     }
 
@@ -103,15 +104,28 @@ class ContentService extends ksdp.integration.Dip {
         let { pageid, scheme, flow, token, account } = payload || {};
         pageid = pageid || this.template.default;
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
-        /*let [content, menu] = await Promise.all(
-            this.getContent({ pageid, flow, token, page }),
+        const route = { ...this.route, scheme };
+        let data = {
+            token,
+            account: {
+                name: account?.user?.firstName || "Guest"
+            },
+            url: {
+                public: utl.mix(this.route.public, route),
+                access: utl.mix(this.route.access, route),
+                logout: utl.mix(this.route.logout, route),
+                home: utl.mix(this.route.home, route),
+                page: utl.mix(this.route.home, route),
+                api: utl.mix(this.route.api, route),
+                src: utl.mix(this.route.src, route),
+            }
+        }
+        let [content, menu] = await Promise.all([
+            this.getContent({ pageid, flow, token, page, data }),
             !page.isFragment ? Promise.resolve([]) : this.loadMenu({ scheme, source: this.path.page })
-        );*/
-        let menu = !page.isFragment ? [] : await this.loadMenu({ scheme, source: this.path.page });
-        let content = await this.getContent({ pageid, flow, token, page });
-        content = content || await this.getContent({ pageid: "main", flow, token, page });
-
-        return !page.isFragment ? content : this.renderLayout({ content, scheme, menu, account, token });
+        ]);
+        content = content || await this.getContent({ pageid: "main", flow, token, page, data });
+        return !page.isFragment ? content : this.renderLayout({ content, scheme, account, menu, data });
     }
 
     /**
@@ -120,27 +134,17 @@ class ContentService extends ksdp.integration.Dip {
      * @returns {Promise<String>}
      */
     renderLayout(payload = {}) {
-        const { content = "", menu, scheme = "view", account, scripts = "", styles = "", title = "Auth API DOC", token = "" } = payload || {};
+        const { data, content = "", menu, scheme = "view", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, scheme });
         return this.tplService.render(
             page.name,
             {
                 menu,
                 title,
-                token,
                 styles,
                 scripts,
                 content,
-                account: {
-                    name: account?.user?.firstName || "Guest"
-                },
-                url: {
-                    access: utl.interpolate(this.route.access, { root: this.route.root }),
-                    logout: utl.interpolate(this.route.logout, { root: this.route.root }),
-                    home: utl.interpolate(this.route.home, { root: this.route.root, scheme }),
-                    api: utl.interpolate(this.route.api, { root: this.route.root, scheme }),
-                    src: utl.interpolate(this.route.src, { root: this.route.root, scheme }),
-                }
+                ...data
             },
             { path: page.path, ext: page.ext }
         );
@@ -153,11 +157,11 @@ class ContentService extends ksdp.integration.Dip {
      */
     loadMenu({ scheme, source }) {
         if (typeof source === "string") {
-            source = _path.resolve(utl.interpolate(source, { scheme, root: this.path.root }));
+            source = _path.resolve(utl.mix(source, { ...this.path, scheme, root: this.path.root }));
         }
         return this.loadDir(source, item => {
             let title = item.name.replace(/\.[a-zA-Z0-9]+$/, "").replace(/^\d+\-/, "");
-            let url = utl.interpolate(this.route.pag, { root: this.route.root, scheme, page: title });
+            let url = utl.mix(this.route.pag, { ...this.route, scheme, page: title });
             return { url, title };
         });
     }

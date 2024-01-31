@@ -48,7 +48,7 @@ class SwaggerController extends ksdp.integration.Dip {
         cfg.swaggerDefinition.tags = this.loadTags(cfg?.topics, metadata);
         cfg.swaggerDefinition.info.version = metadata.version || cfg.swaggerDefinition.info.version;
         cfg.swaggerDefinition.info.description = this.loadDescription(metadata) || cfg.swaggerDefinition.info.description;
-        Array.isArray(cfg.apis) && (cfg.apis = cfg.apis.map(item => utl.interpolate(item, { api: this.path.root })));
+        Array.isArray(cfg.apis) && (cfg.apis = cfg.apis.map(item => utl.mix(item, { api: this.path.root })));
 
         const swaggerSpec = swaggerJSDoc(cfg);
         const delegate = swaggerUi.setup(swaggerSpec, {
