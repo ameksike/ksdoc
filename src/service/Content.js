@@ -7,16 +7,28 @@ const utl = require('../utl');
 class ContentService extends ksdp.integration.Dip {
 
     /**
-     * @description Document Controller
+     * @description Content service
      * @type {Object|null}
      */
     contentService = null;
 
     /**
-     * @description Document Controller
+     * @description Session service
      * @type {Object|null}
      */
     sessionService = null;
+
+    /**
+     * @description Data service
+     * @type {Object|null}
+     */
+    dataService = null;
+
+    /**
+     * @description Language service
+     * @type {Object|null}
+     */
+    languageService = null;
 
     /**
      * @description logger
@@ -54,32 +66,43 @@ class ContentService extends ksdp.integration.Dip {
      */
     template = null;
 
-    async delete({ path, type, id, exts }) {
-        let filename = _path.join(path, type, id + exts);
-        await _fsp.unlink(filename, { withFileTypes: true });
-        return filename;
+    async delete(payload) {
+        let { scheme, filename, extension = "" } = payload || {};
+        try {
+            let file = _path.join(utl.mix(this.path.page, { ...this.path, scheme }), filename + extension);
+            await _fsp.unlink(file); // , { withFileTypes: true }
+            return filename;
+        }
+        catch (error) {
+            this.logger?.error({
+                src: "KsDocs:Content:loadDir",
+                error
+            });
+            return "";
+        }
     }
 
-    async save({ type, path, id, index, content }) {
-        let source = _path.join(path, type);
-        if (!id) {
-            if (!index) {
-                let dirs = await _fsp.readdir(source, { withFileTypes: true });
-                index = (dirs?.length || 0) + 1;
-            }
-            index = utl.padSrt(index, 2);
-            id = index + "-" + title;
+    async save(payload) {
+        let { content, scheme, filename, extension = "" } = payload || {};
+        try {
+            let file = _path.join(utl.mix(this.path.page, { ...this.path, scheme }), filename + extension);
+            await _fsp.writeFile(file, content);
+            return filename;
         }
-        let filename = _path.join(source, id.replace(/\s/g, "-") + this.exts);
-        await _fsp.writeFile(filename, content);
-        return filename;
+        catch (error) {
+            this.logger?.error({
+                src: "KsDocs:Content:loadDir",
+                error
+            });
+            return "";
+        }
     }
 
     searchTpl({ pageid, path, scheme }) {
         let route = { ...this.path, scheme };
         let tpl = utl.mix(this.template[pageid], route);
         let isFragment = !tpl || /snippet\..*/.test(tpl);
-        let ext = !isFragment || !!tpl ? "" : "html";
+        let ext = !isFragment || !!tpl || /\.(md|twig|html|ejs|tpl)$/i.test(pageid) ? "" : "html";
         return {
             exist: !!tpl,
             isFragment,
@@ -105,7 +128,9 @@ class ContentService extends ksdp.integration.Dip {
         pageid = pageid || this.template.default;
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
         const route = { ...this.route, scheme };
+        let lang = await this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, scheme }) }) || {};
         let data = {
+            lang,
             token,
             account: {
                 name: account?.user?.firstName || "Guest"
@@ -153,14 +178,14 @@ class ContentService extends ksdp.integration.Dip {
     /**
      * @description load the main menu
      * @param {Object} payload 
-     * @returns {Array}
+     * @returns {Promise<any>}
      */
     loadMenu({ scheme, source }) {
         if (typeof source === "string") {
             source = _path.resolve(utl.mix(source, { ...this.path, scheme, root: this.path.root }));
         }
         return this.loadDir(source, item => {
-            let title = item.name.replace(/\.[a-zA-Z0-9]+$/, "").replace(/^\d+\-/, "");
+            let title = item.name.replace(/\.html$/i, "");
             let url = utl.mix(this.route.pag, { ...this.route, scheme, page: title });
             return { url, title };
         });
@@ -170,7 +195,7 @@ class ContentService extends ksdp.integration.Dip {
      * @description get the list of topics to the menu
      * @param {Array<String>|String} source 
      * @param {Function|null} [render] 
-     * @returns {Object}
+     * @returns {Promise<any>}
      */
     async loadDir(source, render = null) {
         let dir, files, result;

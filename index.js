@@ -12,6 +12,7 @@ module.exports = new (class extends Document {
         service: {
             Content: require('./src/service/Content'),
             Session: require('./src/service/Session'),
+            Language: require('./src/service/Language'),
         },
         middleware: {
             FormData: require('./src/middleware/FormData'),

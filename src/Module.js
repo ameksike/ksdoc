@@ -7,6 +7,8 @@ const DocumentController = require('./controller/Document');
 const SwaggerController = require('./controller/Swagger');
 const ContentService = require('./service/Content');
 const SessionService = require('./service/Session');
+const LanguageService = require('./service/Language');
+
 const formDataMw = require('./middleware/FormData');
 const { TConfig } = require('./types');
 
@@ -14,27 +16,45 @@ class DocumentModule extends ksdp.integration.Dip {
 
     /**
      * @description Document Controller
-     * @type {typeof DocumentController}
+     * @type {DocumentController|null}
      */
     controller;
 
     /**
      * @description Document Controller
-     * @type {typeof SwaggerController}
+     * @type {SwaggerController|null}
      */
     apiController;
 
     /**
      * @description Document Controller
-     * @type {typeof ContentService}
+     * @type {ContentService|null}
      */
     contentService;
 
     /**
      * @description Document Controller
-     * @type {typeof SessionService}
+     * @type {SessionService|null}
      */
     sessionService;
+
+    /**
+     * @description Document Controller
+     * @type {LanguageService|null}
+     */
+    languageService;
+
+    /**
+     * @description Authorization Service
+     * @type {Object|null}
+     */
+    authService;
+
+    /**
+     * @description Data Service
+     * @type {Object|null}
+     */
+    dataService;
 
     /**
      * @description logger
@@ -78,10 +98,12 @@ class DocumentModule extends ksdp.integration.Dip {
         this.path = {
             root: path.join(__dirname, '../../../docs'),
             // partials
-            resource: '{root}/{scheme}/resource',
+            api: '{root}/{scheme}/api',
             page: '{root}/{scheme}/page',
+            lang: '{root}/{scheme}/lang',
             cache: '{root}/{scheme}/cache',
             config: '{root}/{scheme}/config',
+            resource: '{root}/{scheme}/resource',
         };
         this.route = {
             root: '/doc',
@@ -90,6 +112,7 @@ class DocumentModule extends ksdp.integration.Dip {
             login: '{root}/auth/login',
             logout: '{root}/auth/logout',
             access: '{root}/auth/access',
+            unauthorized: '{root}/auth/access',
             // partials
             public: '{resource}/{scheme}',
             home: '{root}/{scheme}',
@@ -115,6 +138,7 @@ class DocumentModule extends ksdp.integration.Dip {
         this.apiController = new SwaggerController();
         this.contentService = new ContentService();
         this.sessionService = new SessionService();
+        this.languageService = new LanguageService();
     }
 
     /**
@@ -135,6 +159,7 @@ class DocumentModule extends ksdp.integration.Dip {
             option.template instanceof Object && Object.assign(this.template, option.template);
         }
         this.contentService?.inject({
+            languageService: this.languageService || null,
             dataService: this.dataService || null,
             tplService: this.tplService || null,
             logger: this.logger || null,
@@ -167,7 +192,7 @@ class DocumentModule extends ksdp.integration.Dip {
         const mdFormData = formDataMw?.support();
         this.apiController?.configure({ cfg: this.cfg, path: this.path });
         // Resources URL
-        app.use("*.css", (req, res, next) => res.set('Content-Type', 'text/css') && next());
+        publish instanceof Function && app.use("/ksdoc", publish(path.join(__dirname, "webcomponet")));
         publish instanceof Function && app.use(utl.mix(this.route.public, { ...this.route, scheme: ":scheme" }), (req, res, next) => {
             const scheme = req.params.scheme;
             const resouce = path.resolve(utl.mix(this.path.resource, { ...this.path, scheme }));
@@ -177,12 +202,24 @@ class DocumentModule extends ksdp.integration.Dip {
         app.get(utl.mix(this.route.login, this.route), (req, res) => this.controller.login(req, res));
         app.get(utl.mix(this.route.logout, this.route), (req, res) => this.controller.logout(req, res));
         app.get(utl.mix(this.route.access, this.route), (req, res) => this.controller.access(req, res));
+        // Scheme API URL 
+        this.route?.api && this.apiController && app.use(
+            utl.mix(this.route.api, { ...this.route, scheme: ":scheme" }),
+            this.apiController.middlewares(),
+            (req, res, next) => {
+                const scheme = req.params.scheme;
+                const option = {
+                    path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
+                };
+                const action = this.apiController.init(this.cfg, option);
+                action instanceof Function && action(req, res, next);
+            }
+        );
         // Scheme URL 
         app.get(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.show(req, res));
         app.delete(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.delete(req, res));
         app.post(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));
         app.put(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));
-        this.route?.api && app.use(utl.mix(this.route.api, { ...this.route, scheme: ":scheme" }), mdCheck, ...this.apiController.init());
         app.get(this.route.root + "/:scheme", mdCheck, (req, res) => this.controller.show(req, res));
     }
 }

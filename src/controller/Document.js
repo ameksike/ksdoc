@@ -156,9 +156,9 @@ class DocumentController extends ksdp.integration.Dip {
 
     /**
      * @description login action
-     * @param {Request} req 
+     * @param {Object} req 
      * @param {String} [req.flow] 
-     * @param {Response} res 
+     * @param {Object} res 
      */
     async login(req, res) {
         try {
@@ -208,12 +208,13 @@ class DocumentController extends ksdp.integration.Dip {
      * 
      * @param {Object} req 
      * @param {String} [req.flow] 
+     * @param {Object} [req.body] 
      * @param {Object} res 
      */
     async logout(req, res) {
         try {
             this.sessionService?.remove(req, this.sessionKey);
-            res.redirect(this.viewAccess);
+            res.redirect(this.route.unauthorized);
         }
         catch (error) {
             this.logger?.error({
