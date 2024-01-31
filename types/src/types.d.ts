@@ -18,3 +18,30 @@ export type TCls<T> = new (...args: any[]) => T;
  * @returns {T} - An instance of the class.
  */
 export function build<T>(cls: TCls<T>, args?: any[]): T;
+export namespace TConfig {
+    namespace swaggerDefinition {
+        let openapi: string;
+        let tags: any[];
+        namespace info {
+            let version: string;
+            let description: string;
+        }
+        let basePath: string;
+        let servers: {
+            url: string;
+            description: string;
+            variables: {
+                port: {
+                    default: string;
+                };
+                host: {
+                    default: string;
+                };
+            };
+        }[];
+    }
+    let apis: string[];
+    let js: any[];
+    let css: any[];
+    let topics: any[];
+}

@@ -7,19 +7,25 @@ const utl = require('../utl');
 class ContentService extends ksdp.integration.Dip {
 
     /**
-     * @description Document Controller
+     * @description Content service
      * @type {Object|null}
      */
     contentService = null;
 
     /**
-     * @description Document Controller
+     * @description Session service
      * @type {Object|null}
      */
     sessionService = null;
 
     /**
-     * @description Document Controller
+     * @description Data service
+     * @type {Object|null}
+     */
+    dataService = null;
+
+    /**
+     * @description Language service
      * @type {Object|null}
      */
     languageService = null;
@@ -60,25 +66,36 @@ class ContentService extends ksdp.integration.Dip {
      */
     template = null;
 
-    async delete({ path, type, id, exts }) {
-        let filename = _path.join(path, type, id + exts);
-        await _fsp.unlink(filename, { withFileTypes: true });
-        return filename;
+    async delete(payload) {
+        let { scheme, filename, extension = "" } = payload || {};
+        try {
+            let file = _path.join(utl.mix(this.path.page, { ...this.path, scheme }), filename + extension);
+            await _fsp.unlink(file); // , { withFileTypes: true }
+            return filename;
+        }
+        catch (error) {
+            this.logger?.error({
+                src: "KsDocs:Content:loadDir",
+                error
+            });
+            return "";
+        }
     }
 
-    async save({ type, path, id, index, content }) {
-        let source = _path.join(path, type);
-        if (!id) {
-            if (!index) {
-                let dirs = await _fsp.readdir(source, { withFileTypes: true });
-                index = (dirs?.length || 0) + 1;
-            }
-            index = utl.padSrt(index, 2);
-            id = index + "-" + title;
+    async save(payload) {
+        let { content, scheme, filename, extension = "" } = payload || {};
+        try {
+            let file = _path.join(utl.mix(this.path.page, { ...this.path, scheme }), filename + extension);
+            await _fsp.writeFile(file, content);
+            return filename;
         }
-        let filename = _path.join(source, id.replace(/\s/g, "-") + this.exts);
-        await _fsp.writeFile(filename, content);
-        return filename;
+        catch (error) {
+            this.logger?.error({
+                src: "KsDocs:Content:loadDir",
+                error
+            });
+            return "";
+        }
     }
 
     searchTpl({ pageid, path, scheme }) {
@@ -161,7 +178,7 @@ class ContentService extends ksdp.integration.Dip {
     /**
      * @description load the main menu
      * @param {Object} payload 
-     * @returns {Array}
+     * @returns {Promise<any>}
      */
     loadMenu({ scheme, source }) {
         if (typeof source === "string") {
@@ -178,7 +195,7 @@ class ContentService extends ksdp.integration.Dip {
      * @description get the list of topics to the menu
      * @param {Array<String>|String} source 
      * @param {Function|null} [render] 
-     * @returns {Object}
+     * @returns {Promise<any>}
      */
     async loadDir(source, render = null) {
         let dir, files, result;

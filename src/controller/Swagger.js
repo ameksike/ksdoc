@@ -22,10 +22,23 @@ class SwaggerController extends ksdp.integration.Dip {
      */
     content = null;
 
+    /**
+     * @description Template engine
+     * @type {Object}
+     */
+    tplService;
+
+    /**
+     * @description all path 
+     * @type {Object}
+     */
+    path;
+
     constructor() {
         super();
         this.serve = swaggerUi.serve;
         this.cfg = null;
+        this.path = {};
     }
 
     /**
@@ -64,8 +77,8 @@ class SwaggerController extends ksdp.integration.Dip {
     }
 
     loadDescription(metadata = {}) {
-        return this.template?.description ? this.tplHandler?.compile(
-            _path.join(this.template?.description),
+        return this.template?.description ? this.tplService?.compile(
+            "description",
             metadata
         ) : "";
     }

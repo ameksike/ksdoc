@@ -16,34 +16,45 @@ class DocumentModule extends ksdp.integration.Dip {
 
     /**
      * @description Document Controller
-     * @type {typeof DocumentController}
+     * @type {DocumentController|null}
      */
     controller;
 
     /**
      * @description Document Controller
-     * @type {typeof SwaggerController}
+     * @type {SwaggerController|null}
      */
     apiController;
 
     /**
      * @description Document Controller
-     * @type {typeof ContentService}
+     * @type {ContentService|null}
      */
     contentService;
 
     /**
      * @description Document Controller
-     * @type {typeof SessionService}
+     * @type {SessionService|null}
      */
     sessionService;
 
     /**
      * @description Document Controller
-     * @type {typeof LanguageService}
+     * @type {LanguageService|null}
      */
     languageService;
 
+    /**
+     * @description Authorization Service
+     * @type {Object|null}
+     */
+    authService;
+
+    /**
+     * @description Data Service
+     * @type {Object|null}
+     */
+    dataService;
 
     /**
      * @description logger
@@ -101,6 +112,7 @@ class DocumentModule extends ksdp.integration.Dip {
             login: '{root}/auth/login',
             logout: '{root}/auth/logout',
             access: '{root}/auth/access',
+            unauthorized: '{root}/auth/access',
             // partials
             public: '{resource}/{scheme}',
             home: '{root}/{scheme}',
@@ -199,7 +211,8 @@ class DocumentModule extends ksdp.integration.Dip {
                 const option = {
                     path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
                 };
-                this.apiController.init(this.cfg, option)(req, res, next);
+                const action = this.apiController.init(this.cfg, option);
+                action instanceof Function && action(req, res, next);
             }
         );
         // Scheme URL 

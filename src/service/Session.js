@@ -21,13 +21,9 @@ class SessionService {
     /**
      * @description get request token 
      * @param {Object} req 
-     * @param {Object} req.headers.authorization
-     * @param {Object} req.query.authorization 
-     * @param {Object} req.query.token 
-     * @param {Object} req.body.token 
      * @returns {String} token
      */
-    getToken(req) { }
+    getToken(req) { return ""; }
 
     /**
      * @description remove the user session account 

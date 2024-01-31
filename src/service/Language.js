@@ -16,11 +16,15 @@ class Language {
     }
 
     /**
+     * @description load language content
      * @param {Object} [option]
      * @param {String} [option.path]
+     * @param {String} [option.idiom]
+     * @param {String} [option.extension]
      * @returns {Promise<Object>}
      */
-    load({ path, idiom = "en", extension }) {
+    load(option) {
+        const { path, idiom = "en", extension } = option || {};
         try {
             const file = _path.join(path, (idiom || this.default) + "." + (extension || this.extension));
             return Promise.resolve(file ? require(file) : {});
