@@ -168,7 +168,7 @@ class DocumentModule extends ksdp.integration.Dip {
         const mdFormData = formDataMw?.support();
         this.apiController?.configure({ cfg: this.cfg, path: this.path });
         // Resources URL
-        app.use("*.css", (req, res, next) => res.set('Content-Type', 'text/css') && next());
+        publish instanceof Function && app.use("/ksdoc", publish(path.join(__dirname, "webcomponet")));
         publish instanceof Function && app.use(utl.mix(this.route.public, { ...this.route, scheme: ":scheme" }), (req, res, next) => {
             const scheme = req.params.scheme;
             const resouce = path.resolve(utl.mix(this.path.resource, { ...this.path, scheme }));
