@@ -7,6 +7,8 @@ const DocumentController = require('./controller/Document');
 const SwaggerController = require('./controller/Swagger');
 const ContentService = require('./service/Content');
 const SessionService = require('./service/Session');
+const LanguageService = require('./service/Language');
+
 const formDataMw = require('./middleware/FormData');
 const { TConfig } = require('./types');
 
@@ -35,6 +37,13 @@ class DocumentModule extends ksdp.integration.Dip {
      * @type {typeof SessionService}
      */
     sessionService;
+
+    /**
+     * @description Document Controller
+     * @type {typeof LanguageService}
+     */
+    languageService;
+
 
     /**
      * @description logger
@@ -80,6 +89,7 @@ class DocumentModule extends ksdp.integration.Dip {
             // partials
             api: '{root}/{scheme}/api',
             page: '{root}/{scheme}/page',
+            lang: '{root}/{scheme}/lang',
             cache: '{root}/{scheme}/cache',
             config: '{root}/{scheme}/config',
             resource: '{root}/{scheme}/resource',
@@ -116,6 +126,7 @@ class DocumentModule extends ksdp.integration.Dip {
         this.apiController = new SwaggerController();
         this.contentService = new ContentService();
         this.sessionService = new SessionService();
+        this.languageService = new LanguageService();
     }
 
     /**
@@ -136,6 +147,7 @@ class DocumentModule extends ksdp.integration.Dip {
             option.template instanceof Object && Object.assign(this.template, option.template);
         }
         this.contentService?.inject({
+            languageService: this.languageService || null,
             dataService: this.dataService || null,
             tplService: this.tplService || null,
             logger: this.logger || null,

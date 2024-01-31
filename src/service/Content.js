@@ -19,6 +19,12 @@ class ContentService extends ksdp.integration.Dip {
     sessionService = null;
 
     /**
+     * @description Document Controller
+     * @type {Object|null}
+     */
+    languageService = null;
+
+    /**
      * @description logger
      * @type {Object|null}
      */
@@ -79,7 +85,7 @@ class ContentService extends ksdp.integration.Dip {
         let route = { ...this.path, scheme };
         let tpl = utl.mix(this.template[pageid], route);
         let isFragment = !tpl || /snippet\..*/.test(tpl);
-        let ext = !isFragment || !!tpl ? "" : "html";
+        let ext = !isFragment || !!tpl || /\.(md|twig|html|ejs|tpl)$/i.test(pageid) ? "" : "html";
         return {
             exist: !!tpl,
             isFragment,
@@ -105,7 +111,9 @@ class ContentService extends ksdp.integration.Dip {
         pageid = pageid || this.template.default;
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
         const route = { ...this.route, scheme };
+        let lang = await this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, scheme }) }) || {};
         let data = {
+            lang,
             token,
             account: {
                 name: account?.user?.firstName || "Guest"
@@ -160,7 +168,7 @@ class ContentService extends ksdp.integration.Dip {
             source = _path.resolve(utl.mix(source, { ...this.path, scheme, root: this.path.root }));
         }
         return this.loadDir(source, item => {
-            let title = item.name.replace(/\.[a-zA-Z0-9]+$/, "").replace(/^\d+\-/, "");
+            let title = item.name.replace(/\.html$/i, "");
             let url = utl.mix(this.route.pag, { ...this.route, scheme, page: title });
             return { url, title };
         });
