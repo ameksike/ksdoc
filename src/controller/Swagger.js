@@ -86,7 +86,7 @@ class SwaggerController extends ksdp.integration.Dip {
     loadConfig({ path }) {
         try {
             const config = require(_path.join(path, "config.json"));
-            Array.isArray(config?.apis) && (config.apis = config.apis.map(item => _path.join(path, item)));
+            Array.isArray(config?.apis) && (config.apis = config.apis.map(item => _path.resolve(utl.mix(item, { root: path }))));
             return config;
         }
         catch (_) {

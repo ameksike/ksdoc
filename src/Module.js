@@ -207,7 +207,7 @@ class DocumentModule extends ksdp.integration.Dip {
             utl.mix(this.route.api, { ...this.route, scheme: ":scheme" }),
             this.apiController.middlewares(),
             (req, res, next) => {
-                const scheme = req.params.scheme
+                const scheme = req.params.scheme;
                 const option = {
                     path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
                 };

@@ -1,3 +1,4 @@
+/* images */
 img {
     display: block;
     margin-left: auto;
@@ -6,94 +7,76 @@ img {
     margin-bottom: 5px;
     margin-top: 5px;
 }
-
+/* summary */
 summary::-webkit-details-marker,
 summary::marker {
     display: none !important;
     color: white;
 }
-
 details summary {
     text-align: center;
     margin-bottom: 15px;
     pointer-events: none; /* prevents click events */
     user-select: none; /* prevents text selection */
 }
-
-.swagger-ui summary h1 {
-    margin: 0;
-    padding: 0 0 18px 0px;
-}
-
+/* content */
 .content,
 .content nav {
     padding-top: 20px;
 }
-
 nav.bg-dark .navbar-brand {
     color: white;
 }
-
-pre {
-    background-color: #41444e;
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-}
-
-pre>code {
-    background: rgba(0, 0, 0, 0) !important;
-}
-
-code {
-    color: white;
-    background-color: #41444e;
-    border-radius: 8px;
-    padding: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    max-width: 100%;
-    width: 100%;
-    display: flex;
-}
-
-p {
-    margin-top: 0.5rem;
-}
-
+/* table */
 table {
     width: 100%;
 }
-
-table code {
-    margin: 0;
+table code, 
+table code-view {
+    margin: 12;
     padding: 0;
     border-radius: 0;
+    display: flex;
 }
-
 .syntaxhighlighter table {
     margin: 2px 15px 15px 5px;
 }
-
-.syntaxhighlighter table code {
+.syntaxhighlighter table code,
+.syntaxhighlighter table code-view {
     color: #41444e;
     background-color: white;
 }
-
+/* links */
 a:link {
     text-decoration: none;
 }
-
 a:visited {
     text-decoration: none;
 }
-
 a:hover {
     text-decoration: underline;
 }
-
 a:active {
     text-decoration: underline;
+}
+/* form */
+.form-login {
+    margin-top: 1.5rem;
+}
+.form-login input {
+    margin-bottom: 20px;
+}
+.form-login h4,
+.form-login h5 {
+    text-align: center;
+}
+/* roadmap */
+.roadmap {
+    margin-top: 20px;
+}
+/* global */
+p {
+    margin-top: 0.5rem;
 }
 
 .bad-number {
@@ -106,21 +89,4 @@ a:active {
 
 .hide {
     display: none;
-}
-
-.form-login {
-    margin-top: 1.5rem;
-}
-
-.form-login input {
-    margin-bottom: 20px;
-}
-
-.form-login h4,
-.form-login h5 {
-    text-align: center;
-}
-
-.roadmap {
-    margin-top: 20px;
 }
