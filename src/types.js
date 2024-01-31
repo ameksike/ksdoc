@@ -22,6 +22,40 @@ function build(cls, args = []) {
     return new cls(...args);
 }
 
+const TConfig = {
+    swaggerDefinition: {
+        openapi: '3.0.1',
+        tags: [],
+        info: {
+            version: '1.0.0',
+            description: 'API Docs'
+        },
+        basePath: '/',
+        servers: [{
+            url: "http://{host}:{port}",
+            description: "Local development server",
+            variables: {
+                port: {
+                    default: "4000"
+                },
+                host: {
+                    default: "localhost"
+                }
+            }
+        }]
+    },
+    apis: [
+        '{api}/**/*.yml',
+        '{api}/**/*.json',
+        '{api}/**/*.ts',
+        '{api}/**/*.js'
+    ],
+    js: [],
+    css: [],
+    topics: []
+}
+
 module.exports = {
-    build
+    build,
+    TConfig
 };

@@ -9,6 +9,10 @@ describe('Load KsDoc Lib', () => {
 
     it("valid instance", () => {
         expect(KsDoc).toBeInstanceOf(Object);
-        expect(KsDoc.driver.Document).toBeInstanceOf(Object);
+        expect(KsDoc.cls.module.Document).toBeInstanceOf(Function);
+        expect(KsDoc.cls.controller.Document).toBeInstanceOf(Function);
+        expect(KsDoc.cls.controller.Swagger).toBeInstanceOf(Function);
+        expect(KsDoc.cls.service.Content).toBeInstanceOf(Function);
+        expect(KsDoc.cls.service.Session).toBeInstanceOf(Function);
     });
 });
