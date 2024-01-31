@@ -1,8 +1,8 @@
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
+const _path = require('path');
 const ksdp = require('ksdp');
-const path = require('path');
 const utl = require('../utl');
 
 class SwaggerController extends ksdp.integration.Dip {
@@ -39,25 +39,24 @@ class SwaggerController extends ksdp.integration.Dip {
 
     /**
      * @param {Object} [cfg] 
+     * @param {Object} [option] 
      * @returns {Array} midllewares
      */
-    init(cfg = null) {
+    init(cfg = null, option) {
         const metadata = this.content?.getDataSync({ name: this.keys.description }) || {};
-
-        cfg = cfg || this.cfg;
+        const config = this.loadConfig(option);
+        Object.assign(cfg, this.cfg, config);
         cfg.swaggerDefinition.tags = this.loadTags(cfg?.topics, metadata);
         cfg.swaggerDefinition.info.version = metadata.version || cfg.swaggerDefinition.info.version;
         cfg.swaggerDefinition.info.description = this.loadDescription(metadata) || cfg.swaggerDefinition.info.description;
         Array.isArray(cfg.apis) && (cfg.apis = cfg.apis.map(item => utl.mix(item, { api: this.path.root })));
-
         const swaggerSpec = swaggerJSDoc(cfg);
         const delegate = swaggerUi.setup(swaggerSpec, {
             explorer: false,
             customCssUrl: cfg.css,
             customJs: cfg.js
         });
-
-        return [this.serve, delegate];
+        return delegate;
     }
 
     loadTags(topics, metadata) {
@@ -66,9 +65,24 @@ class SwaggerController extends ksdp.integration.Dip {
 
     loadDescription(metadata = {}) {
         return this.template?.description ? this.tplHandler?.compile(
-            path.join(this.template?.description),
+            _path.join(this.template?.description),
             metadata
         ) : "";
+    }
+
+    loadConfig({ path }) {
+        try {
+            const config = require(_path.join(path, "config.json"));
+            Array.isArray(config?.apis) && (config.apis = config.apis.map(item => _path.join(path, item)));
+            return config;
+        }
+        catch (_) {
+            return {};
+        }
+    }
+
+    middlewares() {
+        return swaggerUi.serve;
     }
 }
 

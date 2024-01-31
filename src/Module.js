@@ -78,10 +78,11 @@ class DocumentModule extends ksdp.integration.Dip {
         this.path = {
             root: path.join(__dirname, '../../../docs'),
             // partials
-            resource: '{root}/{scheme}/resource',
+            api: '{root}/{scheme}/api',
             page: '{root}/{scheme}/page',
             cache: '{root}/{scheme}/cache',
             config: '{root}/{scheme}/config',
+            resource: '{root}/{scheme}/resource',
         };
         this.route = {
             root: '/doc',
@@ -177,12 +178,23 @@ class DocumentModule extends ksdp.integration.Dip {
         app.get(utl.mix(this.route.login, this.route), (req, res) => this.controller.login(req, res));
         app.get(utl.mix(this.route.logout, this.route), (req, res) => this.controller.logout(req, res));
         app.get(utl.mix(this.route.access, this.route), (req, res) => this.controller.access(req, res));
+        // Scheme API URL 
+        this.route?.api && this.apiController && app.use(
+            utl.mix(this.route.api, { ...this.route, scheme: ":scheme" }),
+            this.apiController.middlewares(),
+            (req, res, next) => {
+                const scheme = req.params.scheme
+                const option = {
+                    path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
+                };
+                this.apiController.init(this.cfg, option)(req, res, next);
+            }
+        );
         // Scheme URL 
         app.get(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.show(req, res));
         app.delete(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.delete(req, res));
         app.post(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));
         app.put(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));
-        this.route?.api && app.use(utl.mix(this.route.api, { ...this.route, scheme: ":scheme" }), mdCheck, ...this.apiController.init());
         app.get(this.route.root + "/:scheme", mdCheck, (req, res) => this.controller.show(req, res));
     }
 }
