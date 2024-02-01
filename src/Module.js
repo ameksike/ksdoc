@@ -8,12 +8,13 @@ const SwaggerController = require('./controller/Swagger');
 const ContentService = require('./service/Content');
 const SessionService = require('./service/Session');
 const LanguageService = require('./service/Language');
+const ConfigService = require('./service/Config');
+const MenuService = require('./service/Menu');
 
 const formDataMw = require('./middleware/FormData');
 const { TConfig } = require('./types');
 
 class DocumentModule extends ksdp.integration.Dip {
-
     /**
      * @description Document Controller
      * @type {DocumentController|null}
@@ -27,22 +28,34 @@ class DocumentModule extends ksdp.integration.Dip {
     apiController;
 
     /**
-     * @description Document Controller
+     * @description Content Service
      * @type {ContentService|null}
      */
     contentService;
 
     /**
-     * @description Document Controller
+     * @description Session Service
      * @type {SessionService|null}
      */
     sessionService;
 
     /**
-     * @description Document Controller
+     * @description Config Service
+     * @type {ConfigService|null}
+     */
+    configService;
+
+    /**
+     * @description Language Service
      * @type {LanguageService|null}
      */
     languageService;
+
+    /**
+     * @description Menu Service
+     * @type {MenuService|null}
+     */
+    menuService;
 
     /**
      * @description Authorization Service
@@ -96,6 +109,7 @@ class DocumentModule extends ksdp.integration.Dip {
         super();
         this.cfg = { ...TConfig };
         this.path = {
+            lib: __dirname,
             root: path.join(__dirname, '../../../docs'),
             // partials
             api: '{root}/{scheme}/api',
@@ -140,6 +154,14 @@ class DocumentModule extends ksdp.integration.Dip {
         this.contentService = new ContentService();
         this.sessionService = new SessionService();
         this.languageService = new LanguageService();
+        this.configService = new ConfigService({
+            path: this.path
+        });
+        this.menuService = new MenuService({
+            path: this.path,
+            route: this.route,
+            cfg: this.cfg
+        });
     }
 
     /**
@@ -159,7 +181,18 @@ class DocumentModule extends ksdp.integration.Dip {
             option.route instanceof Object && Object.assign(this.route, option.route);
             option.template instanceof Object && Object.assign(this.template, option.template);
         }
+        this.configService?.configure({
+            path: this.path,
+            filename: option?.filename
+        });
+        this.menuService?.configure({
+            path: this.path,
+            route: this.route,
+            cfg: this.cfg
+        });
         this.contentService?.inject({
+            menuService: this.menuService || null,
+            configService: this.configService || null,
             languageService: this.languageService || null,
             dataService: this.dataService || null,
             tplService: this.tplService || null,
@@ -170,10 +203,13 @@ class DocumentModule extends ksdp.integration.Dip {
             cfg: this.cfg
         });
         this.controller?.inject({
+            configService: this.configService || null,
             contentService: this.contentService || null,
             sessionService: this.sessionService || null,
             authService: this.authService || null,
-            logger: this.logger || null
+            logger: this.logger || null,
+            route: this.route,
+            path: this.path,
         });
         return this;
     }
@@ -210,18 +246,19 @@ class DocumentModule extends ksdp.integration.Dip {
             (req, res, next) => {
                 const scheme = req.params.scheme;
                 const option = {
+                    scheme,
                     path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
                 };
-                const action = this.apiController.init(this.cfg, option);
+                const action = this.configure().apiController.init(this.cfg, option);
                 action instanceof Function && action(req, res, next);
             }
         );
         // Scheme URL 
-        app.get(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.show(req, res));
-        app.delete(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.delete(req, res));
-        app.post(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));
-        app.put(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));
-        app.get(this.route.root + "/:scheme", mdCheck, (req, res) => this.controller.show(req, res));
+        app.get(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.configure().controller.show(req, res));
+        app.delete(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.configure().controller.delete(req, res));
+        app.post(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.configure().controller.save(req, res));
+        app.put(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.configure().controller.save(req, res));
+        app.get(this.route.root + "/:scheme", mdCheck, (req, res) => this.configure().controller.show(req, res));
     }
 }
 

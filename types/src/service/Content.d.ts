@@ -2,6 +2,11 @@ export = ContentService;
 declare const ContentService_base: typeof import("ksdp/types/src/integration/Dip");
 declare class ContentService extends ContentService_base {
     /**
+     * @description Config service
+     * @type {Object|null}
+     */
+    configService: any | null;
+    /**
      * @description Content service
      * @type {Object|null}
      */
@@ -11,6 +16,11 @@ declare class ContentService extends ContentService_base {
      * @type {Object|null}
      */
     sessionService: any | null;
+    /**
+     * @description Menu Service
+     * @type {Object|null}
+     */
+    menuService: any | null;
     /**
      * @description Data service
      * @type {Object|null}
@@ -73,7 +83,23 @@ declare class ContentService extends ContentService_base {
         scheme: any;
         data: any;
     }): Promise<any>;
-    select(payload: any): Promise<any>;
+    /**
+     * @description get content to render
+     * @param {Object} [payload]
+     * @param {String} [payload.pageid]
+     * @param {String} [payload.scheme]
+     * @param {String} [payload.flow]
+     * @param {String} [payload.token]
+     * @param {Object} [payload.account]
+     * @returns {Promise<String>} content
+     */
+    select(payload?: {
+        pageid?: string;
+        scheme?: string;
+        flow?: string;
+        token?: string;
+        account?: any;
+    }): Promise<string>;
     /**
      * @description build layout page
      * @param {Object} payload
@@ -81,16 +107,9 @@ declare class ContentService extends ContentService_base {
      */
     renderLayout(payload?: any): Promise<string>;
     /**
-     * @description load the main menu
+     * @description defines the options to use by the TPL engine
      * @param {Object} payload
-     * @returns {Promise<any>}
+     * @returns {Object} options
      */
-    loadMenu({ scheme, source }: any): Promise<any>;
-    /**
-     * @description get the list of topics to the menu
-     * @param {Array<String>|String} source
-     * @param {Function|null} [render]
-     * @returns {Promise<any>}
-     */
-    loadDir(source: Array<string> | string, render?: Function | null): Promise<any>;
+    getBuildOption({ scheme, page, force }: any): any;
 }

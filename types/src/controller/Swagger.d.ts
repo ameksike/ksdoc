@@ -33,9 +33,14 @@ declare class SwaggerController extends SwaggerController_base {
     /**
      * @param {Object} [cfg]
      * @param {Object} [option]
+     * @param {String} [option.path]
+     * @param {String} [option.scheme]
      * @returns {Array} midllewares
      */
-    init(cfg?: any, option?: any): any[];
+    init(cfg?: any, option?: {
+        path?: string;
+        scheme?: string;
+    }): any[];
     loadTags(topics: any, metadata: any): any[];
     loadDescription(metadata?: {}): any;
     loadConfig({ path }: {
