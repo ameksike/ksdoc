@@ -7,6 +7,12 @@ const utl = require('../utl');
 class ContentService extends ksdp.integration.Dip {
 
     /**
+     * @description Config service
+     * @type {Object|null}
+     */
+    configService;
+
+    /**
      * @description Content service
      * @type {Object|null}
      */
@@ -17,6 +23,12 @@ class ContentService extends ksdp.integration.Dip {
      * @type {Object|null}
      */
     sessionService = null;
+
+    /**
+     * @description Menu Service
+     * @type {Object|null}
+     */
+    menuService;
 
     /**
      * @description Data service
@@ -107,7 +119,7 @@ class ContentService extends ksdp.integration.Dip {
             exist: !!tpl,
             isFragment,
             name: tpl ? _path.basename(tpl) : pageid,
-            path: tpl ? _path.dirname(tpl) : utl.mix(path, route),
+            path: tpl ? _path.dirname(tpl) : _path.resolve(utl.mix(path, route) || ""),
             ext
         };
     }
@@ -123,10 +135,20 @@ class ContentService extends ksdp.integration.Dip {
         return content;
     }
 
+    /**
+     * @description get content to render
+     * @param {Object} [payload]
+     * @param {String} [payload.pageid]
+     * @param {String} [payload.scheme] 
+     * @param {String} [payload.flow] 
+     * @param {String} [payload.token] 
+     * @param {Object} [payload.account] 
+     * @returns {Promise<String>} content
+     */
     async select(payload) {
         let { pageid, scheme, flow, token, account } = payload || {};
         pageid = pageid || this.template.default;
-        await this.loadConfig({ scheme });
+        await this.configService?.load({ scheme }, this);
 
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
         let route = { ...this.route, scheme };
@@ -148,12 +170,12 @@ class ContentService extends ksdp.integration.Dip {
             }
         }
 
-        if (this.cfg?.scope !== "public") {
+        if (this.cfg?.scope !== "public" && this.cfg?.scope !== undefined) {
             return this.getContent({ pageid: "404", flow, token, data });
         }
         let [content, menu] = await Promise.all([
             this.getContent({ scheme, pageid, flow, token, page, data }),
-            !page.isFragment ? Promise.resolve([]) : this.loadMenu({ scheme, source: this.path.page })
+            !page.isFragment ? Promise.resolve([]) : this.menuService?.load({ scheme, cfg: this.cfg, path: this.path, route: this.route })
         ]);
         content = content || await this.getContent({ scheme, pageid: "main", flow, token, page, data });
         return !page.isFragment ? content : this.renderLayout({ content, scheme, account, menu, data });
@@ -183,59 +205,10 @@ class ContentService extends ksdp.integration.Dip {
     }
 
     /**
-     * @description load the main menu
+     * @description defines the options to use by the TPL engine
      * @param {Object} payload 
-     * @returns {Promise<any>}
+     * @returns {Object} options
      */
-    loadMenu({ scheme, source }) {
-        if (typeof source === "string") {
-            source = _path.resolve(utl.mix(source, { ...this.path, scheme, root: this.path.root }));
-        }
-        return this.loadDir(source, item => {
-            let title = item.name.replace(/\.html$/i, "");
-            let url = utl.mix(this.route.pag, { ...this.route, scheme, page: title });
-            return { url, title };
-        });
-    }
-
-    /**
-     * @description get the list of topics to the menu
-     * @param {Array<String>|String} source 
-     * @param {Function|null} [render] 
-     * @returns {Promise<any>}
-     */
-    async loadDir(source, render = null) {
-        let dir, files, result;
-        try {
-            dir = Array.isArray(source) ? source : await _fsp.readdir(source, { withFileTypes: true });
-            files = dir.filter(item => (item.isDirectory && !item.isDirectory()) || !item.isDirectory);
-            result = render instanceof Function ? files.map((item, i) => render(item, i, source)) : files;
-        }
-        catch (error) {
-            result = [];
-            this.logger?.error({
-                src: "KsDocs:Content:loadDir",
-                error
-            });
-        }
-        return result;
-    }
-
-    loadConfig({ scheme }) {
-        try {
-            const pathCore = utl.mix(this.path.core, { ...this.path, scheme });
-            const data = require(_path.join(pathCore, "config.json"));
-            data?.cfg && Object.assign(this.cfg, data.cfg);
-            data?.path && Object.assign(this.path, data.path);
-            data?.route && Object.assign(this.route, data.route);
-            data?.template && Object.assign(this.template, data.template);
-            return Promise.resolve(data);
-        }
-        catch (_) {
-            Promise.resolve({});
-        }
-    }
-
     getBuildOption({ scheme, page, force }) {
         let cache = null;
         if ((force === undefined || force === false) && this.path?.cache) {

@@ -8,12 +8,13 @@ const SwaggerController = require('./controller/Swagger');
 const ContentService = require('./service/Content');
 const SessionService = require('./service/Session');
 const LanguageService = require('./service/Language');
+const ConfigService = require('ksdocs/src/service/Config');
+const MenuService = require('ksdocs/src/service/Menu');
 
 const formDataMw = require('./middleware/FormData');
 const { TConfig } = require('./types');
 
 class DocumentModule extends ksdp.integration.Dip {
-
     /**
      * @description Document Controller
      * @type {DocumentController|null}
@@ -27,22 +28,34 @@ class DocumentModule extends ksdp.integration.Dip {
     apiController;
 
     /**
-     * @description Document Controller
+     * @description Content Service
      * @type {ContentService|null}
      */
     contentService;
 
     /**
-     * @description Document Controller
+     * @description Session Service
      * @type {SessionService|null}
      */
     sessionService;
 
     /**
-     * @description Document Controller
+     * @description Config Service
+     * @type {ConfigService|null}
+     */
+    configService;
+
+    /**
+     * @description Language Service
      * @type {LanguageService|null}
      */
     languageService;
+
+    /**
+     * @description Menu Service
+     * @type {MenuService|null}
+     */
+    menuService;
 
     /**
      * @description Authorization Service
@@ -96,6 +109,7 @@ class DocumentModule extends ksdp.integration.Dip {
         super();
         this.cfg = { ...TConfig };
         this.path = {
+            lib: __dirname,
             root: path.join(__dirname, '../../../docs'),
             // partials
             api: '{root}/{scheme}/api',
@@ -140,6 +154,14 @@ class DocumentModule extends ksdp.integration.Dip {
         this.contentService = new ContentService();
         this.sessionService = new SessionService();
         this.languageService = new LanguageService();
+        this.configService = new ConfigService({
+            path: this.path
+        });
+        this.menuService = new MenuService({
+            path: this.path,
+            route: this.route,
+            cfg: this.cfg
+        });
     }
 
     /**
@@ -159,7 +181,18 @@ class DocumentModule extends ksdp.integration.Dip {
             option.route instanceof Object && Object.assign(this.route, option.route);
             option.template instanceof Object && Object.assign(this.template, option.template);
         }
+        this.configService?.configure({
+            path: this.path,
+            filename: option.filename
+        });
+        this.menuService?.configure({
+            path: this.path,
+            route: this.route,
+            cfg: this.cfg
+        });
         this.contentService?.inject({
+            menuService: this.menuService || null,
+            configService: this.configService || null,
             languageService: this.languageService || null,
             dataService: this.dataService || null,
             tplService: this.tplService || null,
@@ -170,6 +203,7 @@ class DocumentModule extends ksdp.integration.Dip {
             cfg: this.cfg
         });
         this.controller?.inject({
+            configService: this.configService || null,
             contentService: this.contentService || null,
             sessionService: this.sessionService || null,
             authService: this.authService || null,

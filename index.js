@@ -13,6 +13,8 @@ module.exports = new (class extends Document {
             Content: require('./src/service/Content'),
             Session: require('./src/service/Session'),
             Language: require('./src/service/Language'),
+            Config: require('./src/service/Config'),
+            Menu: require('./src/service/Menu'),
         },
         middleware: {
             FormData: require('./src/middleware/FormData'),

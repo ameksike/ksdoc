@@ -8,6 +8,12 @@ const uri = ksmf.app.Url.self();
 class DocumentController extends ksdp.integration.Dip {
 
     /**
+     * @description Document Controller
+     * @type {Object|null}
+     */
+    configService;
+
+    /**
      * @type {Console|null}
      */
     logger = null;

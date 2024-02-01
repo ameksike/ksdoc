@@ -25,6 +25,8 @@ KsDoc stands out as a valuable addition to the Ksike ecosystem, offering develop
 
 
 ## Quick overview
+
+- Server file:
 ```Js
 const express = require("express");
 const ksdocs = require("ksdocs");
@@ -38,4 +40,101 @@ ksdocs.configure({
 }).init(app, express.static)
 
 app.listen(5555);
+```
+
+Through the configuration file it is possible to redefine all the behavior of the library as: 
+- **Paths:** The hierarchical path system to use, allowing to have access to the lib resource, local resource and schema resources.
+- **Templates:** The template list to be used. 
+- **Routes:** Public URLs to be used.
+- **Scope:** It is only rendered public scope, by default it is public.
+- Services and Controllers:
+    * **languageService:** Defines how to get the language data to support multilanguage. 
+    * **dataService:** Defines how to get the data content to fill the templates.
+    * **menuService:** Defines how to load the main menu.
+    * **tplService:** Defines the demplate engine management. By default it is an KsTpl instance.
+    * **logger:** Log managements
+    * **sessionService:** Defines how to maintain and store the user session required for authentication and security, if set to null there is no security
+    * **authService:** Defines how to check the user which is trying to login and generate access token.
+    * **apiController:** By default it use Swagger integration 
+
+
+### Optional Config file in JSON format
+
+File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.json ```
+```Json
+{
+  "cfg": {
+    "scope": "public"
+  },
+  "path": {
+    "api": "{root}/{scheme}/api",
+    "page": "{root}/{scheme}/page",
+    "lang": "{root}/{scheme}/lang",
+    "config": "{root}/{scheme}/config",
+    "resource": "{root}/{scheme}/resource",
+    "core": "{root}/{scheme}/_",
+    "cache": "{core}/cache"
+  },
+  "route": {
+    "resource": "/resource",
+    "login": "{root}/auth/login",
+    "logout": "{root}/auth/logout",
+    "access": "{root}/auth/access",
+    "unauthorized": "{root}/auth/access",
+    "public": "{resource}/{scheme}",
+    "home": "{root}/{scheme}",
+    "pag": "{root}/{scheme}/{page}",
+    "api": "{root}/{scheme}/api",
+    "src": "{root}/{scheme}/src"
+  },
+  "template": {
+	  "layout": "{lib}/template/page.layout.html"
+  },
+  "apiController": null
+}
+```
+
+
+### Optional Config file in JavaScript format:
+
+File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.js ```
+```Js
+module.exports = {
+  "cfg": {
+    "scope": "public",
+	"menu": [
+		{ "name": "Introduction", "url": "{root}/{scheme}/{page}" },
+		{ "name": "Onboarding" }
+	]
+  },
+  "path": {
+    "api": "{root}/{scheme}/api",
+    "page": "{root}/{scheme}/page",
+    "lang": "{root}/{scheme}/lang",
+    "config": "{root}/{scheme}/config",
+    "resource": "{root}/{scheme}/resource",
+    "core": "{root}/{scheme}/_",
+    "cache": "{core}/cache"
+  },
+  "route": {
+    "resource": "/resource",
+    "login": "{root}/auth/login",
+    "logout": "{root}/auth/logout",
+    "access": "{root}/auth/access",
+    "unauthorized": "{root}/auth/access",
+    "public": "{resource}/{scheme}",
+    "home": "{root}/{scheme}",
+    "pag": "{root}/{scheme}/{page}",
+    "api": "{root}/{scheme}/api",
+    "src": "{root}/{scheme}/src"
+  },
+  "template": {
+	 "layout": "{core}/template/page.layout.html"
+  },
+  apiController: null,
+  languageService: {
+    load: ({ path, idiom = "en" }) => Promise.resolve(require(path + "/" + idiom + ".json"))
+  },
+  logger: console
+}
 ```
