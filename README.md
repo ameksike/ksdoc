@@ -1,20 +1,15 @@
 # KsDoc library 
 KsDoc is a versatile library within the Ksike ecosystem, designed to streamline and simplify the documentation process for various application types, including CLI, web, and API development. This library integrates seamlessly with Swagger and JSDoc, harnessing their combined power to provide comprehensive and intuitive documentation.
 
-Unified Documentation:
-- KsDoc unifies the documentation process, catering to the diverse needs of CLI, web, and API applications.
+- **Unified Documentation:** KsDoc unifies the documentation process, catering to the diverse needs of CLI, web, and API applications.
 
-Intuitive Documentation Generation:
-- The library simplifies the generation of documentation, making it an intuitive process for developers.
+- **Intuitive Documentation Generation:** The library simplifies the generation of documentation, making it an intuitive process for developers.
 
-Swagger Integration:
-- Seamless integration with Swagger ensures that APIs are well-documented, conforming to industry standards.
+- **Swagger Integration:** Seamless integration with Swagger ensures that APIs are well-documented, conforming to industry standards.
 
-JSDoc Integration:
-- By leveraging JSDoc, KsDoc enhances code documentation, ensuring clarity and consistency in the codebase.
+- **JSDoc Integration:** By leveraging JSDoc, KsDoc enhances code documentation, ensuring clarity and consistency in the codebase.
 
-Multi-Area Support:
-- KsDoc supports documentation across various areas, providing a holistic solution for different application domains.
+- **Multi-Area Support:** KsDoc supports documentation across various areas, providing a holistic solution for different application domains.
 
 This library belong to the Ksike ecosystem:
 - [KsMf](https://www.npmjs.com/package/ksmf) - Microframework (WEB, REST API, CLI, Proxy, etc)
