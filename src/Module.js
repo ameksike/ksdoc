@@ -183,7 +183,7 @@ class DocumentModule extends ksdp.integration.Dip {
         }
         this.configService?.configure({
             path: this.path,
-            filename: option.filename
+            filename: option?.filename
         });
         this.menuService?.configure({
             path: this.path,
@@ -246,16 +246,16 @@ class DocumentModule extends ksdp.integration.Dip {
                 const option = {
                     path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
                 };
-                const action = this.apiController.init(this.cfg, option);
+                const action = this.configure().apiController.init(this.cfg, option);
                 action instanceof Function && action(req, res, next);
             }
         );
         // Scheme URL 
-        app.get(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.show(req, res));
-        app.delete(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.controller.delete(req, res));
-        app.post(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));
-        app.put(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.controller.save(req, res));
-        app.get(this.route.root + "/:scheme", mdCheck, (req, res) => this.controller.show(req, res));
+        app.get(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.configure().controller.show(req, res));
+        app.delete(this.route.root + "/:scheme/:id", mdCheck, (req, res) => this.configure().controller.delete(req, res));
+        app.post(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.configure().controller.save(req, res));
+        app.put(this.route.root + "/:scheme/:id", mdCheck, mdFormData, (req, res) => this.configure().controller.save(req, res));
+        app.get(this.route.root + "/:scheme", mdCheck, (req, res) => this.configure().controller.show(req, res));
     }
 }
 

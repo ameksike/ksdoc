@@ -39,18 +39,19 @@ class ConfigService {
             data = data || await this.readFile(file);
             if (target) {
                 // main options
-                data?.cfg && Object.assign(target.cfg, data.cfg);
-                data?.path && Object.assign(target.path, data.path);
-                data?.route && Object.assign(target.route, data.route);
-                data?.template && Object.assign(target.template, data.template);
+                data?.cfg && (target.cfg = { ...target.cfg, ...data.cfg });
+                data?.path && (target.path = { ...target.path, ...data.path });
+                data?.route && (target.route = { ...target.route, ...data.route });
+                data?.template && (target.template = { ...target.template, ...data.template });
                 // main services
-                data?.languageService && Object.assign(target.languageService, data.languageService);
-                data?.dataService && Object.assign(target.dataService, data.dataService);
-                data?.tplService && Object.assign(target.tplService, data.tplService);
-                data?.logger && Object.assign(target.logger, data.logger);
-                data?.sessionService && Object.assign(target.sessionService, data.sessionService);
-                data?.authService && Object.assign(target.authService, data.authService);
-                data?.apiController && Object.assign(target.apiController, data.apiController);
+                data?.languageService && (target.languageService = data.languageService);
+                data?.dataService && (target.dataService = data.dataService);
+                data?.menuService && (target.menuService = data.menuService);
+                data?.tplService && (target.tplService = data.tplService);
+                data?.logger && (target.logger = data.logger);
+                data?.sessionService && (target.sessionService = data.sessionService);
+                data?.authService && (target.authService = data.authService);
+                data?.apiController && (target.apiController = data.apiController);
             }
             return data;
         }
