@@ -117,7 +117,7 @@ class ContentService extends ksdp.integration.Dip {
             return '';
         }
         page = page || this.searchTpl({ pageid, path, scheme });
-        let pageOption = { path: page.path, ext: page.ext };
+        let pageOption = this.getBuildOption({ page, scheme });
         let pageData = await this.dataService?.getData({ name: page.name, flow, token });
         let content = await this.tplService.render(page.name, { ...data, ...pageData }, pageOption);
         return content;
@@ -126,8 +126,10 @@ class ContentService extends ksdp.integration.Dip {
     async select(payload) {
         let { pageid, scheme, flow, token, account } = payload || {};
         pageid = pageid || this.template.default;
+        await this.loadConfig({ scheme });
+
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
-        const route = { ...this.route, scheme };
+        let route = { ...this.route, scheme };
         let lang = await this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, scheme }) }) || {};
         let data = {
             lang,
@@ -145,11 +147,15 @@ class ContentService extends ksdp.integration.Dip {
                 src: utl.mix(this.route.src, route),
             }
         }
+
+        if (this.cfg?.scope !== "public") {
+            return this.getContent({ pageid: "404", flow, token, data });
+        }
         let [content, menu] = await Promise.all([
-            this.getContent({ pageid, flow, token, page, data }),
+            this.getContent({ scheme, pageid, flow, token, page, data }),
             !page.isFragment ? Promise.resolve([]) : this.loadMenu({ scheme, source: this.path.page })
         ]);
-        content = content || await this.getContent({ pageid: "main", flow, token, page, data });
+        content = content || await this.getContent({ scheme, pageid: "main", flow, token, page, data });
         return !page.isFragment ? content : this.renderLayout({ content, scheme, account, menu, data });
     }
 
@@ -161,6 +167,7 @@ class ContentService extends ksdp.integration.Dip {
     renderLayout(payload = {}) {
         const { data, content = "", menu, scheme = "view", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, scheme });
+        const pageOption = this.getBuildOption({ page, scheme, force: true });
         return this.tplService.render(
             page.name,
             {
@@ -171,7 +178,7 @@ class ContentService extends ksdp.integration.Dip {
                 content,
                 ...data
             },
-            { path: page.path, ext: page.ext }
+            pageOption
         );
     }
 
@@ -214,6 +221,29 @@ class ContentService extends ksdp.integration.Dip {
         return result;
     }
 
+    loadConfig({ scheme }) {
+        try {
+            const pathCore = utl.mix(this.path.core, { ...this.path, scheme });
+            const data = require(_path.join(pathCore, "config.json"));
+            data?.cfg && Object.assign(this.cfg, data.cfg);
+            data?.path && Object.assign(this.path, data.path);
+            data?.route && Object.assign(this.route, data.route);
+            data?.template && Object.assign(this.template, data.template);
+            return Promise.resolve(data);
+        }
+        catch (_) {
+            Promise.resolve({});
+        }
+    }
+
+    getBuildOption({ scheme, page, force }) {
+        let cache = null;
+        if ((force === undefined || force === false) && this.path?.cache) {
+            const cachePath = _path.resolve(utl.mix(this.path.cache, { ...this.path, scheme }));
+            cache = { cacheExt: "html", cacheType: "file", cachePath };
+        }
+        return { path: page.path, ext: page.ext, ...cache };
+    }
 }
 
 module.exports = ContentService;

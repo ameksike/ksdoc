@@ -101,9 +101,10 @@ class DocumentModule extends ksdp.integration.Dip {
             api: '{root}/{scheme}/api',
             page: '{root}/{scheme}/page',
             lang: '{root}/{scheme}/lang',
-            cache: '{root}/{scheme}/cache',
             config: '{root}/{scheme}/config',
             resource: '{root}/{scheme}/resource',
+            core: '{root}/{scheme}/_',
+            cache: '{core}/cache',
         };
         this.route = {
             root: '/doc',
