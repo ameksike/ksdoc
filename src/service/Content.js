@@ -167,6 +167,7 @@ class ContentService extends ksdp.integration.Dip {
     renderLayout(payload = {}) {
         const { data, content = "", menu, scheme = "view", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, scheme });
+        const pageOption = this.getBuildOption({ page, scheme, force: true });
         return this.tplService.render(
             page.name,
             {
@@ -177,7 +178,7 @@ class ContentService extends ksdp.integration.Dip {
                 content,
                 ...data
             },
-            { path: page.path, ext: page.ext }
+            pageOption
         );
     }
 
@@ -235,10 +236,10 @@ class ContentService extends ksdp.integration.Dip {
         }
     }
 
-    getBuildOption({ scheme, page }) {
+    getBuildOption({ scheme, page, force }) {
         let cache = null;
-        if (this.path?.cache) {
-            const cachePath = utl.mix(this.path.cache, { ...this.path, scheme })
+        if ((force === undefined || force === false) && this.path?.cache) {
+            const cachePath = _path.resolve(utl.mix(this.path.cache, { ...this.path, scheme }));
             cache = { cacheExt: "html", cacheType: "file", cachePath };
         }
         return { path: page.path, ext: page.ext, ...cache };
