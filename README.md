@@ -64,7 +64,11 @@ File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.json ```
 ```Json
 {
   "cfg": {
-    "scope": "public"
+    "scope": "public",
+    "menu": [
+      { "name": "Introduction", "url": "{root}/{scheme}/{page}" },
+      { "name": "Onboarding" }
+    ]
   },
   "path": {
     "api": "{root}/{scheme}/api",
@@ -101,11 +105,7 @@ File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.js ```
 ```Js
 module.exports = {
   "cfg": {
-    "scope": "public",
-    "menu": [
-      { "name": "Introduction", "url": "{root}/{scheme}/{page}" },
-      { "name": "Onboarding" }
-    ]
+    "scope": "public"
   },
   "path": {
     "api": "{root}/{scheme}/api",
