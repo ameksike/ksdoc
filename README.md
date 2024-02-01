@@ -102,10 +102,10 @@ File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.js ```
 module.exports = {
   "cfg": {
     "scope": "public",
-	"menu": [
-		{ "name": "Introduction", "url": "{root}/{scheme}/{page}" },
-		{ "name": "Onboarding" }
-	]
+    "menu": [
+      { "name": "Introduction", "url": "{root}/{scheme}/{page}" },
+      { "name": "Onboarding" }
+    ]
   },
   "path": {
     "api": "{root}/{scheme}/api",
