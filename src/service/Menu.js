@@ -22,6 +22,12 @@ class MenuService {
      */
     cfg;
 
+    /**
+     * @description logger
+     * @type {Object|null}
+     */
+    logger;
+
     constructor({ path, route, cfg }) {
         this.route = cfg || {};
         this.route = route || {};

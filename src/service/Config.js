@@ -14,14 +14,28 @@ class ConfigService {
      */
     path;
 
+    /**
+     * 
+     * @param {Object} payload 
+     * @param {String} [payload.filename] 
+     * @param {String} [payload.path] 
+     */
     constructor({ filename, path }) {
         this.filename = filename || "config";
         this.path = path || {};
     }
 
+    /**
+     * @description configure the service
+     * @param {Object} payload 
+     * @param {String} [payload.filename] 
+     * @param {String} [payload.path] 
+     * @returns {ConfigService} self
+     */
     configure({ filename, path }) {
         this.filename = filename || this.filename;
         this.path = path || this.path;
+        return this;
     }
 
     /**
@@ -29,6 +43,7 @@ class ConfigService {
      * @param {Object} payload 
      * @param {String} payload.scheme 
      * @param {String} payload.filename 
+     * @param {String} payload.type 
      * @param {Object} target
      * @returns {Promise<any>} config
      */
@@ -63,7 +78,8 @@ class ConfigService {
     /**
      * @description read objects from file 
      * @param {String} file 
-     * @param {String} type 
+     * @param {String} [type]
+     * @param {String} [encoding] 
      * @returns {Promise<Object>}
      */
     async readFile(file, type = "", encoding = "utf8") {

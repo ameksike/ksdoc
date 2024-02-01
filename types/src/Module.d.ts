@@ -12,20 +12,30 @@ declare class DocumentModule extends DocumentModule_base {
      */
     apiController: SwaggerController | null;
     /**
-     * @description Document Controller
+     * @description Content Service
      * @type {ContentService|null}
      */
     contentService: ContentService | null;
     /**
-     * @description Document Controller
+     * @description Session Service
      * @type {SessionService|null}
      */
     sessionService: SessionService | null;
     /**
-     * @description Document Controller
+     * @description Config Service
+     * @type {ConfigService|null}
+     */
+    configService: ConfigService | null;
+    /**
+     * @description Language Service
      * @type {LanguageService|null}
      */
     languageService: LanguageService | null;
+    /**
+     * @description Menu Service
+     * @type {MenuService|null}
+     */
+    menuService: MenuService | null;
     /**
      * @description Authorization Service
      * @type {Object|null}
@@ -84,4 +94,6 @@ import DocumentController = require("./controller/Document");
 import SwaggerController = require("./controller/Swagger");
 import ContentService = require("./service/Content");
 import SessionService = require("./service/Session");
+import ConfigService = require("./service/Config");
 import LanguageService = require("./service/Language");
+import MenuService = require("./service/Menu");

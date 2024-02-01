@@ -11,6 +11,8 @@ declare const _exports: {
             Content: typeof import("./src/service/Content");
             Session: typeof import("./src/service/Session");
             Language: typeof import("./src/service/Language");
+            Config: typeof import("./src/service/Config");
+            Menu: typeof import("./src/service/Menu");
         };
         middleware: {
             FormData: typeof import("./src/middleware/FormData");
@@ -20,7 +22,9 @@ declare const _exports: {
     apiController: import("./src/controller/Swagger");
     contentService: import("./src/service/Content");
     sessionService: import("./src/service/Session");
+    configService: import("./src/service/Config");
     languageService: import("./src/service/Language");
+    menuService: import("./src/service/Menu");
     authService: any;
     dataService: any;
     logger: any;
@@ -43,6 +47,8 @@ declare const _exports: {
                 Content: typeof import("./src/service/Content");
                 Session: typeof import("./src/service/Session");
                 Language: typeof import("./src/service/Language");
+                Config: typeof import("./src/service/Config");
+                Menu: typeof import("./src/service/Menu");
             };
             middleware: {
                 FormData: typeof import("./src/middleware/FormData");
@@ -52,7 +58,9 @@ declare const _exports: {
         apiController: import("./src/controller/Swagger");
         contentService: import("./src/service/Content");
         sessionService: import("./src/service/Session");
+        configService: import("./src/service/Config");
         languageService: import("./src/service/Language");
+        menuService: import("./src/service/Menu");
         authService: any;
         dataService: any;
         logger: any;

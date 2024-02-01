@@ -33,6 +33,17 @@ class DocumentController extends ksdp.integration.Dip {
      */
     contentService = null;
 
+    /**
+     * @description all path 
+     * @type {Object}
+     */
+    path;
+
+    /**
+     * @description all routes 
+     * @type {Object}
+     */
+    route;
 
     /**
      * @description render the document content 
@@ -219,7 +230,7 @@ class DocumentController extends ksdp.integration.Dip {
      */
     async logout(req, res) {
         try {
-            this.sessionService?.remove(req, this.sessionKey);
+            this.sessionService?.remove(req, "docs");
             res.redirect(this.route.unauthorized);
         }
         catch (error) {

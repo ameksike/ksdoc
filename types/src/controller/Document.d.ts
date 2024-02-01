@@ -2,6 +2,11 @@ export = DocumentController;
 declare const DocumentController_base: typeof import("ksdp/types/src/integration/Dip");
 declare class DocumentController extends DocumentController_base {
     /**
+     * @description Document Controller
+     * @type {Object|null}
+     */
+    configService: any | null;
+    /**
      * @type {Console|null}
      */
     logger: Console | null;
@@ -17,6 +22,16 @@ declare class DocumentController extends DocumentController_base {
      * @type {Object|null}
      */
     contentService: any | null;
+    /**
+     * @description all path
+     * @type {Object}
+     */
+    path: any;
+    /**
+     * @description all routes
+     * @type {Object}
+     */
+    route: any;
     /**
      * @description render the document content
      * @param {Request} req

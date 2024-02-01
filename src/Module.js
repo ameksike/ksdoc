@@ -8,8 +8,8 @@ const SwaggerController = require('./controller/Swagger');
 const ContentService = require('./service/Content');
 const SessionService = require('./service/Session');
 const LanguageService = require('./service/Language');
-const ConfigService = require('ksdocs/src/service/Config');
-const MenuService = require('ksdocs/src/service/Menu');
+const ConfigService = require('./service/Config');
+const MenuService = require('./service/Menu');
 
 const formDataMw = require('./middleware/FormData');
 const { TConfig } = require('./types');
@@ -207,7 +207,9 @@ class DocumentModule extends ksdp.integration.Dip {
             contentService: this.contentService || null,
             sessionService: this.sessionService || null,
             authService: this.authService || null,
-            logger: this.logger || null
+            logger: this.logger || null,
+            route: this.route,
+            path: this.path,
         });
         return this;
     }
@@ -244,6 +246,7 @@ class DocumentModule extends ksdp.integration.Dip {
             (req, res, next) => {
                 const scheme = req.params.scheme;
                 const option = {
+                    scheme,
                     path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
                 };
                 const action = this.configure().apiController.init(this.cfg, option);

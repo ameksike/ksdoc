@@ -53,10 +53,12 @@ class SwaggerController extends ksdp.integration.Dip {
     /**
      * @param {Object} [cfg] 
      * @param {Object} [option] 
+     * @param {String} [option.path] 
+     * @param {String} [option.scheme] 
      * @returns {Array} midllewares
      */
-    init(cfg = null, option) {
-        const metadata = this.content?.getDataSync({ name: this.keys.description }) || {};
+    init(cfg = null, option = null) {
+        const metadata = this.content?.getDataSync({ name: option?.scheme }, cfg) || {};
         const config = this.loadConfig(option);
         Object.assign(cfg, this.cfg, config);
         cfg.swaggerDefinition.tags = this.loadTags(cfg?.topics, metadata);
@@ -77,10 +79,7 @@ class SwaggerController extends ksdp.integration.Dip {
     }
 
     loadDescription(metadata = {}) {
-        return this.template?.description ? this.tplService?.compile(
-            "description",
-            metadata
-        ) : "";
+        return metadata?.description ? this.tplService?.compile("description", metadata) : "";
     }
 
     loadConfig({ path }) {
