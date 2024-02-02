@@ -83,13 +83,14 @@ class SwaggerController extends ksdp.integration.Dip {
         return des.replace(/[\r\n]/gi, " ");
     }
 
-    loadConfig({ path }) {
+    loadConfig({ path, flow }) {
         try {
             const config = require(_path.join(path, "config.json"));
             Array.isArray(config?.apis) && (config.apis = config.apis.map(item => _path.resolve(utl.mix(item, { root: path }))));
             return config;
         }
         catch (_) {
+            this.logger?.error({ flow, src: "KsDoc:API:config:load", error: { message: _?.message } });
             return {};
         }
     }

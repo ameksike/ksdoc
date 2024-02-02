@@ -178,6 +178,7 @@ class DocumentModule extends ksdp.integration.Dip {
             option.sessionService && (this.sessionService = option.sessionService);
             option.authService && (this.authService = option.authService);
             option.dataService && (this.dataService = option.dataService);
+            option.logger && (this.logger = option.logger);
             option.cfg instanceof Object && Object.assign(this.cfg, option.cfg);
             option.path instanceof Object && Object.assign(this.path, option.path);
             option.route instanceof Object && Object.assign(this.route, option.route);
@@ -185,9 +186,11 @@ class DocumentModule extends ksdp.integration.Dip {
         }
         this.configService?.configure({
             path: this.path,
+            logger: this.logger || null,
             filename: option?.filename
         });
         this.menuService?.configure({
+            logger: this.logger || null,
             path: this.path,
             route: this.route,
             cfg: this.cfg
@@ -263,6 +266,7 @@ class DocumentModule extends ksdp.integration.Dip {
                 const token = this.sessionService?.getToken(req);
                 const account = this.sessionService?.account(req, this.sessionKey);
                 const option = {
+                    flow: req.flow,
                     ...req.query,
                     token,
                     account,
