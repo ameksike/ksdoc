@@ -274,7 +274,7 @@ class DocumentModule extends ksdp.integration.Dip {
             return this;
         }
         const routed = { ...this.route, scheme: ":scheme" };
-        const mwCheck = this.sessionService?.check(utl.mix(this.route.access, routed), 'docs', 'simple');
+        const mwCheck = (req, res, next) => this.contentController.check(req, res, next);
         const mwFormData = formDataMw?.support();
         // Resources URL
         publish instanceof Function && app.use("/ksdoc", publish(path.join(__dirname, "webcomponet")));

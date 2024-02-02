@@ -47,10 +47,11 @@ class MenuService {
      * @param {Object} [payload.path] 
      * @param {Object} [payload.route] 
      * @param {Object} [payload.cfg] 
+     * @param {Function} [payload.action] 
      * @param {Object|String} [payload.source]
      * @returns {Promise<any>} config
      */
-    async load({ scheme, path, route, cfg, source }) {
+    async load({ scheme, path, route, cfg, source, action }) {
         try {
             path = path || this.path;
             route = route || this.route;
@@ -59,7 +60,7 @@ class MenuService {
             if (typeof source === "string") {
                 source = _path.resolve(utl.mix(source, { ...path, scheme }));
             }
-            return this.loadDir(source, item => {
+            return this.loadDir(source, action instanceof Function ? action : (item) => {
                 let title = item.name.replace(/\.html$/i, "");
                 let url = utl.mix(item.url || this.route.pag, { ...this.route, scheme, page: title });
                 return { url, title };
@@ -74,13 +75,14 @@ class MenuService {
      * @description get the list of topics to the menu
      * @param {Array<Object>|String} source 
      * @param {Function|null} [render] 
+     * @param {Boolean|null} [onlyDir] 
      * @returns {Promise<any>}
      */
-    async loadDir(source, render = null) {
+    async loadDir(source, render = null, onlyDir = false) {
         let dir, files, result;
         try {
             dir = Array.isArray(source) ? source : await _fsp.readdir(source, { withFileTypes: true });
-            files = dir.filter(item => (item.isDirectory && !item.isDirectory()) || !item.isDirectory);
+            files = onlyDir === null || onlyDir === undefined ? dir : dir.filter(item => !onlyDir && (item.isDirectory instanceof Function && !item.isDirectory() || !item.isDirectory));
             result = render instanceof Function ? files.map((item, i) => render(item, i, source)) : files;
         }
         catch (error) {

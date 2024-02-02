@@ -64,6 +64,46 @@ class ContentController extends ksdp.integration.Dip {
     }
 
     /**
+     * @description check user sessions 
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     */
+    async check(req, res, next) {
+        if (!this.sessionService) {
+            next();
+        }
+        try {
+            let option = {
+                scheme: req.params.scheme,
+                pageid: req.params.id,
+                originalUrl: req.url || req.originalUrl,
+                redirectUrl: uts.mix(this.route.access, { ...this.route, scheme: req.params.scheme }),
+                key: this.sessionKey,
+                mode: 'simple'
+            }
+            const validated = await this.sessionService?.check(option, { req, res, next });
+            if (validated !== undefined) {
+                if (validated) {
+                    next();
+                } else {
+                    this.sessionService?.create(req, this.sessionKey, { originalUrl: option.originalUrl });
+                    res.redirect(uri.add(option.redirectUrl, { msg: "error_invalid_user", ...req.query }, req));
+                }
+            }
+        }
+        catch (error) {
+            this.logger?.error({
+                flow: req.flow,
+                src: "KsDoc:check",
+                error: { message: error?.message || error, stack: error?.stack },
+                data: req.body
+            });
+            next();
+        }
+    }
+
+    /**
      * @description add or update documents 
      * @param {Request} req 
      * @param {Response} res 
