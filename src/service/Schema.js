@@ -153,20 +153,26 @@ class SchemaService extends ksdp.integration.Dip {
         let [lang, cont, articles] = await Promise.all([
             this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, scheme }), idiom }),
             dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, scheme, flow, token }),
-            Promise.all(await this.menuService?.loadDir(this.path.root, async (item) => {
-                let artConf = await this.configService?.load({ scheme: item.name });
-                let metadata = artConf?.metadata || { scheme: item.name };
-                let delta = Math.abs(Date.now() - (new Date(parseInt(metadata.date)))) / (1000 * 60 * 60 * 24);
-                metadata.scheme = item.name;
-                metadata.name = metadata.name || metadata.scheme;
-                metadata.group = metadata.group || "community";
-                metadata.url = utl.mix(this.route.home, { ...this.route, scheme: item.name });
-                delta < 10 && (metadata.badge = {
-                    class: delta < 5 ? "new" : "hot",
-                    title: delta < 5 ? "new" : "hot"
-                });
-                return metadata;
-            }, true))
+            await this.menuService?.loadDir(this.path.root, {
+                onlyDir: true,
+                filter: (item) => {
+                    return !query?.search ? item : new RegExp(".*" + query?.search + ".*", "gi").test(item.name);
+                },
+                render: async (item) => {
+                    let artConf = await this.configService?.load({ scheme: item.name });
+                    let metadata = artConf?.metadata || { scheme: item.name };
+                    let delta = Math.abs(Date.now() - (new Date(parseInt(metadata.date)))) / (1000 * 60 * 60 * 24);
+                    metadata.scheme = item.name;
+                    metadata.name = metadata.name || metadata.scheme;
+                    metadata.group = metadata.group || "community";
+                    metadata.url = utl.mix(this.route.home, { ...this.route, scheme: item.name });
+                    delta < 10 && (metadata.badge = {
+                        class: delta < 5 ? "new" : "hot",
+                        title: delta < 5 ? "new" : "hot"
+                    });
+                    return metadata;
+                }
+            })
         ]);
 
         let data = {

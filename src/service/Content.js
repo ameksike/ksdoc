@@ -191,14 +191,14 @@ class ContentService extends ksdp.integration.Dip {
      * @returns {Promise<String>}
      */
     renderLayout(payload = {}) {
-        const { data, content = "", menu, scheme = "view", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
+        const { data, content = "", menu, scheme = "view", scripts = "", styles = "", title } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, scheme });
         const pageOption = this.getBuildOption({ page, scheme, force: true });
         return this.tplService.render(
             page.name,
             {
+                title: title || data?.lang?.title || "Auth API DOC",
                 menu,
-                title,
                 styles,
                 scripts,
                 content,

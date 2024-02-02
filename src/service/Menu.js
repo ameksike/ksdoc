@@ -60,10 +60,12 @@ class MenuService {
             if (typeof source === "string") {
                 source = _path.resolve(utl.mix(source, { ...path, scheme }));
             }
-            return this.loadDir(source, action instanceof Function ? action : (item) => {
-                let title = item.name.replace(/\.html$/i, "");
-                let url = utl.mix(item.url || this.route.pag, { ...this.route, scheme, page: title });
-                return { url, title };
+            return this.loadDir(source, {
+                render: action instanceof Function ? action : (item) => {
+                    let title = item.name.replace(/\.html$/i, "");
+                    let url = utl.mix(item.url || this.route.pag, { ...this.route, scheme, page: title });
+                    return { url, title };
+                }
             });
         }
         catch (_) {
@@ -78,12 +80,14 @@ class MenuService {
      * @param {Boolean|null} [onlyDir] 
      * @returns {Promise<Array<any>>}
      */
-    async loadDir(source, render = null, onlyDir = false) {
+    async loadDir(source, { render = null, onlyDir = false, filter }) {
         let dir, files, result;
         try {
             dir = Array.isArray(source) ? source : await _fsp.readdir(source, { withFileTypes: true });
             files = onlyDir === null || onlyDir === undefined ? dir : dir.filter(item => !onlyDir === (item.isDirectory instanceof Function && !item.isDirectory() || !item.isDirectory));
             result = render instanceof Function ? files.map((item, i) => render(item, i, source)) : files;
+            result = await Promise.all(result);
+            result = filter instanceof Function ? result.filter(item => filter(item)) : result;
         }
         catch (error) {
             result = [];
