@@ -5,7 +5,7 @@ const utl = ksmf.app.Utl.self();
 const uri = ksmf.app.Url.self();
 const uts = require('../utl');
 
-class DocumentController extends ksdp.integration.Dip {
+class ContentController extends ksdp.integration.Dip {
 
     /**
      * @description Document Controller
@@ -246,4 +246,4 @@ class DocumentController extends ksdp.integration.Dip {
     }
 }
 
-module.exports = DocumentController;
+module.exports = ContentController;
