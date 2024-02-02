@@ -191,7 +191,8 @@ class DocumentController extends ksdp.integration.Dip {
             }
             this.sessionService?.create(req, this.sessionKey, { access_token: payload.access_token, flow: req.flow });
             let sess = this.sessionService?.account(req, this.sessionKey);
-            let rurl = sess?.originalUrl || req.query.redirectUrl || uts.mix(this.route.home, { ...this.route, scheme });
+            let orgu = sess?.originalUrl || req.query.redirectUrl;
+            let rurl = orgu && orgu !== "/" ? orgu : uts.mix(this.route.home, { ...this.route, scheme });
             this.logger?.info({
                 flow: req.flow,
                 src: "KsDoc:login",

@@ -117,7 +117,7 @@ class DocumentModule extends ksdp.integration.Dip {
             lang: '{root}/{scheme}/lang',
             config: '{root}/{scheme}/config',
             resource: '{root}/{scheme}/resource',
-            core: '{root}/{scheme}/_',
+            core: '{root}/{scheme}/core',
             cache: '{core}/cache',
         };
         this.route = {
@@ -141,7 +141,7 @@ class DocumentModule extends ksdp.integration.Dip {
             login: path.join(__dirname, 'template', 'snippet.login.html'),
             404: path.join(__dirname, 'template', 'page.404.html'),
             main: path.join(__dirname, 'template', 'snippet.main.html'),
-            description: path.join(__dirname, 'template', 'snippet.des.html'),
+            desc: path.join(__dirname, 'template', 'fragment.des.html'),
         };
         this.tplService = kstpl.configure({
             map: { "md": "markdown", "html": "twing", "twig": "twing", "ejs": "ejs", "htmljs": "ejs" },
@@ -205,6 +205,7 @@ class DocumentModule extends ksdp.integration.Dip {
             cfg: this.cfg
         });
         this.controller?.inject({
+            dataService: this.dataService || null,
             configService: this.configService || null,
             contentService: this.contentService || null,
             sessionService: this.sessionService || null,
@@ -213,6 +214,16 @@ class DocumentModule extends ksdp.integration.Dip {
             route: this.route,
             path: this.path,
         });
+        this.apiController?.inject({
+            dataService: this.dataService || null,
+            configService: this.configService || null,
+            contentService: this.contentService || null,
+            sessionService: this.sessionService || null,
+            authService: this.authService || null,
+            logger: this.logger || null,
+            route: this.route,
+            path: this.path,
+        })
         return this;
     }
 
@@ -245,14 +256,20 @@ class DocumentModule extends ksdp.integration.Dip {
         // Scheme API URL 
         this.route?.api && this.apiController && app.use(
             utl.mix(this.route.api, routed),
+            mdCheck,
             this.apiController.middlewares(),
-            (req, res, next) => {
+            async (req, res, next) => {
                 const scheme = req.params.scheme;
+                const token = this.sessionService?.getToken(req);
+                const account = this.sessionService?.account(req, this.sessionKey);
                 const option = {
+                    ...req.query,
+                    token,
+                    account,
                     scheme,
                     path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
                 };
-                const action = this.configure().apiController.init(this.cfg, option);
+                const action = await this.configure().apiController.init(this.cfg, option);
                 action instanceof Function && action(req, res, next);
             }
         );
