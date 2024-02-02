@@ -1,0 +1,27 @@
+<section class="form-login row">
+    <h4>{{lang.access.title}}  </h4>
+    <h5>{{lang.access.subtitle}}  </h5>
+
+    <form action="{{url.login}}" method="post">
+        <div class="form-group ">
+            <label for="staticEmail" class="col-sm-2 col-form-label">{{lang.username}}</label>
+            <div class="col-sm-10">
+                <input type="input" class="form-control" name="username" placeholder="{{lang.username}}" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputPassword" class="col-sm-2 col-form-label">{{lang.password}}</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" name="password" placeholder="{{lang.password}}" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{lang.btn.login}}</button>
+
+        <input type="input" style="display: none;" name="grant_type" value="password" />
+        <input type="input" style="display: none;" name="client_id" value="auth-api-doc" />
+        <input type="input" style="display: none;" name="client_secret" value="9876543210" />
+        <input type="input" style="display: none;" name="scope" value="DOC_READ" />
+    </form>
+</section>

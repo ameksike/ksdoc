@@ -13,12 +13,6 @@ class ContentService extends ksdp.integration.Dip {
     configService;
 
     /**
-     * @description Content service
-     * @type {Object|null}
-     */
-    contentService = null;
-
-    /**
      * @description Session service
      * @type {Object|null}
      */
@@ -130,8 +124,7 @@ class ContentService extends ksdp.integration.Dip {
         }
         page = page || this.searchTpl({ pageid, path, scheme });
         let pageOption = this.getBuildOption({ page, scheme });
-        let pageData = await this.dataService?.getData({ name: page.name, flow, token });
-        let content = await this.tplService.render(page.name, { ...data, ...pageData }, pageOption);
+        let content = await this.tplService.render(page.name, data, pageOption);
         return content;
     }
 
@@ -141,21 +134,30 @@ class ContentService extends ksdp.integration.Dip {
      * @param {String} [payload.pageid]
      * @param {String} [payload.scheme] 
      * @param {String} [payload.flow] 
+     * @param {String} [payload.idm] 
      * @param {String} [payload.token] 
      * @param {Object} [payload.account] 
+     * @param {Object} [payload.query] 
+     * @param {Object} [payload.dataSrv] 
      * @returns {Promise<String>} content
      */
     async select(payload) {
-        let { pageid, scheme, flow, token, account } = payload || {};
+        let { pageid, scheme, flow, token, account, query, dataSrv } = payload || {};
         pageid = pageid || this.template.default;
         await this.configService?.load({ scheme }, this);
 
+        let idiom = account?.lang || payload?.query?.idiom || "en";
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
         let route = { ...this.route, scheme };
-        let lang = await this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, scheme }) }) || {};
+        let [lang, cont] = await Promise.all([
+            this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, scheme }), idiom }),
+            dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, scheme, flow, token })
+        ]);
+
         let data = {
             lang,
             token,
+            ...query,
             account: {
                 name: account?.user?.firstName || "Guest"
             },
@@ -163,11 +165,13 @@ class ContentService extends ksdp.integration.Dip {
                 public: utl.mix(this.route.public, route),
                 access: utl.mix(this.route.access, route),
                 logout: utl.mix(this.route.logout, route),
+                login: utl.mix(this.route.login, route),
                 home: utl.mix(this.route.home, route),
                 page: utl.mix(this.route.home, route),
                 api: utl.mix(this.route.api, route),
                 src: utl.mix(this.route.src, route),
-            }
+            },
+            ...cont
         }
 
         if (this.cfg?.scope !== "public" && this.cfg?.scope !== undefined) {

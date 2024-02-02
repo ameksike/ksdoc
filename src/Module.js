@@ -117,17 +117,17 @@ class DocumentModule extends ksdp.integration.Dip {
             lang: '{root}/{scheme}/lang',
             config: '{root}/{scheme}/config',
             resource: '{root}/{scheme}/resource',
-            core: '{root}/{scheme}/_',
+            core: '{root}/{scheme}/core',
             cache: '{core}/cache',
         };
         this.route = {
             root: '/doc',
             resource: '/resource',
             // security
-            login: '{root}/auth/login',
-            logout: '{root}/auth/logout',
-            access: '{root}/auth/access',
-            unauthorized: '{root}/auth/access',
+            login: '{root}/{scheme}/sec/login',
+            logout: '{root}/{scheme}/sec/logout',
+            access: '{root}/{scheme}/sec/access',
+            unauthorized: '{root}/{scheme}/sec/access',
             // partials
             public: '{resource}/{scheme}',
             home: '{root}/{scheme}',
@@ -138,10 +138,10 @@ class DocumentModule extends ksdp.integration.Dip {
         this.template = {
             default: 'main',
             layout: path.join(__dirname, 'template', 'page.layout.html'),
-            login: path.join(__dirname, 'template', 'page.login.html'),
+            login: path.join(__dirname, 'template', 'snippet.login.html'),
             404: path.join(__dirname, 'template', 'page.404.html'),
             main: path.join(__dirname, 'template', 'snippet.main.html'),
-            description: path.join(__dirname, 'template', 'snippet.des.html'),
+            desc: path.join(__dirname, 'template', 'fragment.des.html'),
         };
         this.tplService = kstpl.configure({
             map: { "md": "markdown", "html": "twing", "twig": "twing", "ejs": "ejs", "htmljs": "ejs" },
@@ -176,6 +176,8 @@ class DocumentModule extends ksdp.integration.Dip {
             option.apiController && (this.apiController = option.apiController);
             option.contentService && (this.contentService = option.contentService);
             option.sessionService && (this.sessionService = option.sessionService);
+            option.authService && (this.authService = option.authService);
+            option.dataService && (this.dataService = option.dataService);
             option.cfg instanceof Object && Object.assign(this.cfg, option.cfg);
             option.path instanceof Object && Object.assign(this.path, option.path);
             option.route instanceof Object && Object.assign(this.route, option.route);
@@ -203,6 +205,7 @@ class DocumentModule extends ksdp.integration.Dip {
             cfg: this.cfg
         });
         this.controller?.inject({
+            dataService: this.dataService || null,
             configService: this.configService || null,
             contentService: this.contentService || null,
             sessionService: this.sessionService || null,
@@ -211,6 +214,16 @@ class DocumentModule extends ksdp.integration.Dip {
             route: this.route,
             path: this.path,
         });
+        this.apiController?.inject({
+            dataService: this.dataService || null,
+            configService: this.configService || null,
+            contentService: this.contentService || null,
+            sessionService: this.sessionService || null,
+            authService: this.authService || null,
+            logger: this.logger || null,
+            route: this.route,
+            path: this.path,
+        })
         return this;
     }
 
@@ -225,31 +238,38 @@ class DocumentModule extends ksdp.integration.Dip {
         if (typeof app?.use !== "function" || typeof app?.post !== "function") {
             return this;
         }
-        const mdCheck = this.sessionService?.check(utl.mix(this.route.access, this.route), 'docs', 'simple');
+        const routed = { ...this.route, scheme: ":scheme" };
+        const mdCheck = this.sessionService?.check(utl.mix(this.route.access, routed), 'docs', 'simple');
         const mdFormData = formDataMw?.support();
         this.apiController?.configure({ cfg: this.cfg, path: this.path });
         // Resources URL
         publish instanceof Function && app.use("/ksdoc", publish(path.join(__dirname, "webcomponet")));
-        publish instanceof Function && app.use(utl.mix(this.route.public, { ...this.route, scheme: ":scheme" }), (req, res, next) => {
+        publish instanceof Function && app.use(utl.mix(this.route.public, routed), (req, res, next) => {
             const scheme = req.params.scheme;
             const resouce = path.resolve(utl.mix(this.path.resource, { ...this.path, scheme }));
             publish(resouce)(req, res, next);
         });
         // Security URL
-        app.get(utl.mix(this.route.login, this.route), (req, res) => this.controller.login(req, res));
-        app.get(utl.mix(this.route.logout, this.route), (req, res) => this.controller.logout(req, res));
-        app.get(utl.mix(this.route.access, this.route), (req, res) => this.controller.access(req, res));
+        app.post(utl.mix(this.route.login, routed), (req, res) => this.controller.login(req, res));
+        app.get(utl.mix(this.route.logout, routed), (req, res) => this.controller.logout(req, res));
+        app.get(utl.mix(this.route.access, routed), (req, res) => this.controller.access(req, res));
         // Scheme API URL 
         this.route?.api && this.apiController && app.use(
-            utl.mix(this.route.api, { ...this.route, scheme: ":scheme" }),
+            utl.mix(this.route.api, routed),
+            mdCheck,
             this.apiController.middlewares(),
-            (req, res, next) => {
+            async (req, res, next) => {
                 const scheme = req.params.scheme;
+                const token = this.sessionService?.getToken(req);
+                const account = this.sessionService?.account(req, this.sessionKey);
                 const option = {
+                    ...req.query,
+                    token,
+                    account,
                     scheme,
                     path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
                 };
-                const action = this.configure().apiController.init(this.cfg, option);
+                const action = await this.configure().apiController.init(this.cfg, option);
                 action instanceof Function && action(req, res, next);
             }
         );
