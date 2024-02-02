@@ -53,6 +53,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             position: relative;
+            height: 93%;
         }
 
         .quadrant img {
@@ -74,6 +75,9 @@
 
         .article-label.new {
             background-color: #28a745;
+        }
+        .article-label.hot {
+            background-color: #df1024;
         }
 
         .quadrant:hover {
@@ -117,6 +121,20 @@
         .advantage p {
             font-size: 1.1rem;
         }
+
+        .truncated-with {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 95%;
+        }
+
+        .truncated-heigh {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 </head>
 
@@ -136,7 +154,8 @@
             <form action="/doc" method="get">
                 <div class="col-md-12">
                     <div class="input-group">
-                        <input type="text" name="search" class="form-control search-input" placeholder="Search for articles...">
+                        <input type="text" name="search" class="form-control search-input"
+                            placeholder="Search for articles...">
                         <button class="btn btn-primary search-btn" type="submit">Search</button>
                     </div>
                 </div>
@@ -144,45 +163,26 @@
         </div>
 
         <div class="row">
-            <div class="col-md-4">
-                <div class="quadrant">
-                    <span class="article-label">Most Viewed</span>
-                    <img src="article1.jpg" alt="Article 1">
-                    <h3>Article 1</h3>
-                    <p>Discover the most viewed article. Gain valuable insights and knowledge.</p>
-                    <a href="article1-url" class="btn btn-primary">Read More</a>
-                </div>
-            </div>
 
+            {% for item in articles %}
             <div class="col-md-4">
-                <div class="quadrant">
-                    <span class="article-label new">New</span>
-                    <img src="article1.jpg" alt="Article 2">
-                    <h3>Article 2</h3>
-                    <p>Explore the latest articles. Stay up-to-date with the newest trends and information.</p>
-                    <a href="article2-url" class="btn btn-primary">Read More</a>
+                <div class="quadrant d-flex flex-column">
+                    <div class="">
+                        {% if item.badge %}
+                        <span class="article-label {{item.badge.class}}">{{item.badge.title}}</span>
+                        {% endif %}
+                        <!-- img src="article1.jpg" alt="image" -->
+                        <h5 class="truncated-with">{{item.group}}</h5>
+                        <h3 class="truncated-with">{{item.name}}</h3>
+                        <p class="truncated-heigh">{{item.description}}</p>
+                    </div>
+                    <div class="mt-auto">
+                        <a href="{{item.url}}" class="btn btn-primary">Read More</a>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
 
-            <div class="col-md-4">
-                <div class="quadrant">
-                    <span class="article-label new">New</span>
-                    <img src="article1.jpg" alt="Article 2">
-                    <h3>Article 3</h3>
-                    <p>Explore the latest articles. Stay up-to-date with the newest trends and information.</p>
-                    <a href="article2-url" class="btn btn-primary">Read More</a>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="quadrant">
-                    <span class="article-label new">New</span>
-                    <img src="article1.jpg" alt="Article 2">
-                    <h3>Article 3</h3>
-                    <p>Explore the latest articles. Stay up-to-date with the newest trends and information.</p>
-                    <a href="article2-url" class="btn btn-primary">Read More</a>
-                </div>
-            </div>
         </div>
 
         <div class="row">

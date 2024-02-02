@@ -76,13 +76,13 @@ class MenuService {
      * @param {Array<Object>|String} source 
      * @param {Function|null} [render] 
      * @param {Boolean|null} [onlyDir] 
-     * @returns {Promise<any>}
+     * @returns {Promise<Array<any>>}
      */
     async loadDir(source, render = null, onlyDir = false) {
         let dir, files, result;
         try {
             dir = Array.isArray(source) ? source : await _fsp.readdir(source, { withFileTypes: true });
-            files = onlyDir === null || onlyDir === undefined ? dir : dir.filter(item => !onlyDir && (item.isDirectory instanceof Function && !item.isDirectory() || !item.isDirectory));
+            files = onlyDir === null || onlyDir === undefined ? dir : dir.filter(item => !onlyDir === (item.isDirectory instanceof Function && !item.isDirectory() || !item.isDirectory));
             result = render instanceof Function ? files.map((item, i) => render(item, i, source)) : files;
         }
         catch (error) {

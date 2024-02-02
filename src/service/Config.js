@@ -41,15 +41,17 @@ class ConfigService {
     /**
      * @description check the user session
      * @param {Object} payload 
-     * @param {String} payload.scheme 
-     * @param {String} payload.filename 
-     * @param {String} payload.type 
-     * @param {Object} target
+     * @param {String} [payload.scheme]
+     * @param {String} [payload.filename]
+     * @param {String} [payload.file]
+     * @param {String} [payload.path]
+     * @param {String} [payload.type] 
+     * @param {Object} [target]
      * @returns {Promise<any>} config
      */
-    async load({ scheme, filename, type }, target) {
+    async load({ scheme, file, filename, path, type }, target) {
         try {
-            let file = _path.join(utl.mix(this.path.core, { ...this.path, scheme }), filename || this.filename);
+            file = file || _path.join(utl.mix(path || this.path.core, { ...this.path, scheme }), filename || this.filename);
             let data = await this.readFile(file + (type || ".json"), type || "json");
             data = data || await this.readFile(file);
             if (target) {
