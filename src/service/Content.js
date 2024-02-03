@@ -144,7 +144,7 @@ class ContentService extends ksdp.integration.Dip {
     async select(payload) {
         let { pageid, scheme, flow, token, account, query, dataSrv } = payload || {};
         pageid = pageid || this.template.default;
-        await this.configService?.load({ scheme }, this);
+        let cfg = await this.configService?.load({ scheme }, this);
 
         let idiom = account?.lang || payload?.query?.idiom || "en";
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
@@ -155,6 +155,7 @@ class ContentService extends ksdp.integration.Dip {
         ]);
 
         let data = {
+            title: cfg?.metadata?.name,
             lang,
             token,
             ...query,
@@ -191,18 +192,18 @@ class ContentService extends ksdp.integration.Dip {
      * @returns {Promise<String>}
      */
     renderLayout(payload = {}) {
-        const { data, content = "", menu, scheme = "view", scripts = "", styles = "", title } = payload || {};
+        const { data, content = "", menu, scheme = "view", scripts = "", styles = "" } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, scheme });
         const pageOption = this.getBuildOption({ page, scheme, force: true });
         return this.tplService.render(
             page.name,
             {
-                title: title || data?.lang?.title || "Auth API DOC",
                 menu,
                 styles,
                 scripts,
                 content,
-                ...data
+                ...data,
+                title: data?.lang?.title || data?.title || "API DOC",
             },
             pageOption
         );
