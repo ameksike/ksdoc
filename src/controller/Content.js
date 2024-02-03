@@ -22,7 +22,7 @@ class ContentController extends ksdp.integration.Dip {
      * @type {Object|null}
      */
     sessionService = null;
-    
+
     /**
      * @type {Object|null}
      */
@@ -57,12 +57,25 @@ class ContentController extends ksdp.integration.Dip {
      * @param {Object} res 
      */
     async show(req, res) {
-        let token = this.sessionService?.getToken(req);
-        let account = this.sessionService?.account(req, this.cfg?.session?.key);
-        let pageid = req.params.id || "";
-        let scheme = req.params.scheme;
-        let layout = await this.contentService.select({ token, account, pageid, scheme, query: req.query });
-        res.send(layout);
+        try {
+            let scheme = req.params.scheme;
+            let config = req.config = req.config || await this.configService?.load({ scheme }, this.contentService);
+            let token = this.sessionService?.getToken(req);
+            let account = this.sessionService?.account(req, this.cfg?.session?.key);
+            let pageid = req.params.id || "";
+            let layout = await this.contentService.select({ token, account, pageid, scheme, query: req.query, config });
+            res.send(layout);
+        }
+        catch (error) {
+            this.logger?.error({
+                flow: req.flow,
+                src: "KsDoc:check",
+                error: { message: error?.message || error, stack: error?.stack },
+                data: req.body
+            });
+            res.status(500).end();
+        }
+
     }
 
     /**
@@ -72,25 +85,27 @@ class ContentController extends ksdp.integration.Dip {
      * @param {*} next 
      */
     async check(req, res, next) {
-        if (!this.sessionService) {
-            next();
-        }
         try {
+            let scheme = req.params.scheme;
+            let config = req.config = req.config || await this.configService?.load({ scheme }, this.contentService);
+            if (!this.sessionService || !config?.cfg?.auth?.required) {
+                return next();
+            }
             let option = {
-                scheme: req.params.scheme,
+                scheme,
                 pageid: req.params.id,
                 originalUrl: req.url || req.originalUrl,
-                redirectUrl: uts.mix(this.route.access, { ...this.route, scheme: req.params.scheme }),
+                redirectUrl: uts.mix(this.route.access, { ...this.route, scheme }),
                 key: this.cfg?.session?.key,
                 mode: 'simple'
             }
             const validated = await this.sessionService?.check(option, { req, res, next });
             if (validated !== undefined) {
                 if (validated) {
-                    next();
+                    return next();
                 } else {
                     this.sessionService?.create(req, this.cfg?.session?.key, { originalUrl: option.originalUrl });
-                    res.redirect(uri.add(option.redirectUrl, { msg: "error_invalid_user", ...req.query }, req));
+                    return res.redirect(uri.add(option.redirectUrl, { msg: "error_invalid_user", ...req.query }, req));
                 }
             }
         }
@@ -185,10 +200,11 @@ class ContentController extends ksdp.integration.Dip {
      */
     async access(req, res) {
         try {
+            let scheme = req.params.scheme;
+            let config = req.config = req.config || await this.configService?.load({ scheme }, this.contentService);
             let token = this.sessionService?.getToken(req);
             let account = this.sessionService?.account(req, this.cfg?.session?.key);
-            let scheme = req.params.scheme;
-            let layout = await this.contentService.select({ token, account, pageid: "login", scheme, query: req.query });
+            let layout = await this.contentService.select({ token, account, pageid: "login", scheme, query: req.query, config });
             res.send(layout);
         }
         catch (error) {

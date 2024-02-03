@@ -73,12 +73,20 @@ class SwaggerController extends ksdp.integration.Dip {
      */
     async init(cfg = null, option = null) {
         const config = this.loadConfig(option);
-        Object.assign(cfg, this.cfg, config);
+        cfg = { ...cfg, ...this.cfg, ...config };
         const metadata = await this.dataService?.load({ ...option, name: "desc" }) || {};
         cfg.swaggerDefinition.tags = this.loadTags(cfg?.topics, metadata);
-        cfg.swaggerDefinition.info.version = metadata.version || cfg.swaggerDefinition.info.version;
-        cfg.swaggerDefinition.info.description = await this.loadDescription({ ...option, pageid: "desc", dataSrv: metadata }) || cfg.swaggerDefinition.info.description;
-        Array.isArray(cfg.apis) && (cfg.apis = cfg.apis.map(item => utl.mix(item, { api: this.path.root })));
+        cfg.swaggerDefinition.info.version = metadata?.version || cfg?.swaggerDefinition?.info?.version;
+        cfg.swaggerDefinition.info.description = await this.loadDescription({
+            ...option,
+            pageid: "desc",
+            dataSrv: {
+                ...metadata,
+                description: cfg.swaggerDefinition.info.description,
+                version: cfg.swaggerDefinition.info.version,
+            }
+        });
+        //Array.isArray(cfg.apis) && (cfg.apis = cfg.apis.map(item => utl.mix(item, { api: this.path.root })));
         const swaggerSpec = swaggerJSDoc(cfg);
         const delegate = swaggerUi.setup(swaggerSpec, {
             explorer: false,
@@ -104,8 +112,8 @@ class SwaggerController extends ksdp.integration.Dip {
      * @returns {Promise<string>} description
      */
     async loadDescription(metadata = {}) {
-        const des = await this.contentService.select(metadata);
-        return des.replace(/[\r\n]/gi, " ");
+        const des = await this.contentService?.select(metadata);
+        return des ? des.replace(/[\r\n]/gi, " ") : metadata?.dataSrv?.description;
     }
 
     /**
@@ -113,11 +121,14 @@ class SwaggerController extends ksdp.integration.Dip {
      * @param {Object} payload 
      * @param {String} [payload.flow]
      * @param {String} [payload.path]
+     * @param {String} [payload.file]
+     * @param {String} [payload.filename]
      * @returns {Object} config
      */
-    loadConfig({ path, flow }) {
+    loadConfig({ path, flow, file, filename = "config.json" }) {
         try {
-            const config = require(_path.join(path, "config.json"));
+            file = file || _path.join(path, filename);
+            const config = require(file);
             Array.isArray(config?.apis) && (config.apis = config.apis.map(item => _path.resolve(utl.mix(item, { root: path }))));
             return config;
         }

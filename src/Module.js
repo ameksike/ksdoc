@@ -247,6 +247,7 @@ class DocumentModule extends ksdp.integration.Dip {
             schemaService: this.schemaService || null,
             configService: this.configService || null,
             authService: this.authService || null,
+            dataService: this.dataService || null,
             logger: this.logger || null,
             route: this.route,
             path: this.path,

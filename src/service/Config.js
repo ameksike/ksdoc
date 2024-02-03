@@ -13,7 +13,7 @@ class ConfigService {
      * @type {Object}
      */
     path;
-    
+
     /**
      * @description logger
      * @type {Object}
@@ -60,7 +60,8 @@ class ConfigService {
      */
     async load({ scheme, file, filename, path, type }, target) {
         try {
-            file = file || _path.join(utl.mix(path || this.path.core, { ...this.path, scheme }), filename || this.filename);
+            let paths = { ...this.path, scheme };
+            file = file || _path.join(utl.mix(path || this.path.core, paths), filename || this.filename);
             let data = await this.readFile(file + (type || ".json"), type || "json");
             data = data || await this.readFile(file);
             if (target) {
