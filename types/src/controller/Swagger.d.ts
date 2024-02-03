@@ -72,11 +72,15 @@ declare class SwaggerController extends SwaggerController_base {
      * @param {Object} payload
      * @param {String} [payload.flow]
      * @param {String} [payload.path]
+     * @param {String} [payload.file]
+     * @param {String} [payload.filename]
      * @returns {Object} config
      */
-    loadConfig({ path, flow }: {
+    loadConfig({ path, flow, file, filename }: {
         flow?: string;
         path?: string;
+        file?: string;
+        filename?: string;
     }): any;
     middlewares(): any;
 }

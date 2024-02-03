@@ -89,6 +89,7 @@ declare class ContentService extends ContentService_base {
      * @param {Object} [payload.account]
      * @param {Object} [payload.query]
      * @param {Object} [payload.dataSrv]
+     * @param {Object} [payload.config]
      * @returns {Promise<String>} content
      */
     select(payload?: {
@@ -100,6 +101,7 @@ declare class ContentService extends ContentService_base {
         account?: any;
         query?: any;
         dataSrv?: any;
+        config?: any;
     }): Promise<string>;
     /**
      * @description build layout page

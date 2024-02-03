@@ -49,7 +49,7 @@ declare class ContentController extends ContentController_base {
      * @param {*} res
      * @param {*} next
      */
-    check(req: any, res: any, next: any): Promise<void>;
+    check(req: any, res: any, next: any): Promise<any>;
     /**
      * @description add or update documents
      * @param {Object} req
