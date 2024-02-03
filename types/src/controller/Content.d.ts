@@ -71,20 +71,27 @@ declare class ContentController extends ContentController_base {
      * @description login action
      * @param {Object} req
      * @param {String} [req.flow]
+     * @param {String} [req.body]
      * @param {Object} res
      */
     login(req: {
         flow?: string;
+        body?: string;
     }, res: any): Promise<void>;
     /**
      *
      * @param {Object} req
      * @param {String} [req.flow]
      * @param {Object} [req.body]
+     * @param {Object} [req.params]
+     * @param {String} [req.params.scheme]
      * @param {Object} res
      */
     logout(req: {
         flow?: string;
         body?: any;
+        params?: {
+            scheme?: string;
+        };
     }, res: any): Promise<void>;
 }

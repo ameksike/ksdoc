@@ -204,7 +204,7 @@ class SchemaService extends ksdp.integration.Dip {
      * @returns {Promise<String>}
      */
     renderLayout(payload = {}) {
-        const { data, content = "", menu, scheme = "view", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
+        const { data, content = "", menu = null, scheme = "view", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, scheme });
         const pageOption = this.getBuildOption({ page, scheme, force: true });
         return this.tplService.render(

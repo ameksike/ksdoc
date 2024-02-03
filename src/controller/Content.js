@@ -208,6 +208,7 @@ class ContentController extends ksdp.integration.Dip {
      * @description login action
      * @param {Object} req 
      * @param {String} [req.flow] 
+     * @param {String} [req.body] 
      * @param {Object} res 
      */
     async login(req, res) {
@@ -262,6 +263,8 @@ class ContentController extends ksdp.integration.Dip {
      * @param {Object} req 
      * @param {String} [req.flow] 
      * @param {Object} [req.body] 
+     * @param {Object} [req.params] 
+     * @param {String} [req.params.scheme] 
      * @param {Object} res 
      */
     async logout(req, res) {
