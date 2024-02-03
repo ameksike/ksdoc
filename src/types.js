@@ -23,6 +23,25 @@ function build(cls, args = []) {
 }
 
 const TConfig = {
+    menu: null,
+    session: {
+        key: "docs"
+    },
+    schema: {
+        default: ""
+    },
+    metadata: {
+        name: "KsDoc Service",
+        description: "description.",
+        version: "1.0.0",
+        icon: "secure",
+        image: "secure",
+        group: "Ksike",
+        date: "1706135685000"
+    }
+}
+
+const TConfigAPI = {
     swaggerDefinition: {
         openapi: '3.0.1',
         tags: [],
@@ -52,10 +71,11 @@ const TConfig = {
     ],
     js: [],
     css: [],
-    topics: []
+    topics: [],
 }
 
 module.exports = {
     build,
-    TConfig
+    TConfig,
+    TConfigAPI
 };

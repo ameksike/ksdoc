@@ -18,10 +18,6 @@ class SchemaController extends ksdp.integration.Dip {
      * @type {Object|null}
      */
     sessionService = null;
-    /**
-     * @type {String}
-     */
-    sessionKey = "docs";
 
     /**
      * @type {Object|null}
@@ -56,7 +52,7 @@ class SchemaController extends ksdp.integration.Dip {
             return res.redirect(redirectURl);
         }
         let token = this.sessionService?.getToken(req);
-        let account = this.sessionService?.account(req, this.sessionKey);
+        let account = this.sessionService?.account(req, this.cfg?.session?.key);
         let layout = await this.schemaService.select({ token, account, query: req.query });
         res.send(layout);
     }

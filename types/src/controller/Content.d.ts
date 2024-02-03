@@ -15,10 +15,6 @@ declare class ContentController extends ContentController_base {
      */
     sessionService: any | null;
     /**
-     * @type {String}
-     */
-    sessionKey: string;
-    /**
      * @type {Object|null}
      */
     authService: any | null;

@@ -6,11 +6,6 @@ declare class MenuService {
         cfg: any;
     });
     /**
-     * @description logger
-     * @type {Object}
-     */
-    logger: any;
-    /**
      * @description all path
      * @type {Object}
      */
@@ -25,6 +20,11 @@ declare class MenuService {
      * @type {Object}
      */
     cfg: any;
+    /**
+     * @description logger
+     * @type {Object|null}
+     */
+    logger: any | null;
     configure({ path, route, cfg }: {
         path: any;
         route: any;

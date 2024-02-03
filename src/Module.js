@@ -293,7 +293,7 @@ class DocumentModule extends ksdp.integration.Dip {
             async (req, res, next) => {
                 const scheme = req.params.scheme;
                 const token = this.sessionService?.getToken(req);
-                const account = this.sessionService?.account(req, this.sessionKey);
+                const account = this.sessionService?.account(req, this.cfg?.session?.key);
                 const option = {
                     flow: req.flow,
                     ...req.query,

@@ -15,10 +15,6 @@ declare class SchemaController extends SchemaController_base {
      */
     sessionService: any | null;
     /**
-     * @type {String}
-     */
-    sessionKey: string;
-    /**
      * @type {Object|null}
      */
     authService: any | null;
