@@ -23,6 +23,16 @@ declare class SwaggerController extends SwaggerController_base {
      * @type {Object}
      */
     path: any;
+    /**
+     * @description Content Service
+     * @type {Object|null}
+     */
+    contentService: any | null;
+    /**
+     * @description Data Service
+     * @type {Object|null}
+     */
+    dataService: any | null;
     serve: any;
     /**
      * @description configure the SwaggerController module
@@ -35,16 +45,19 @@ declare class SwaggerController extends SwaggerController_base {
      * @param {Object} [option]
      * @param {String} [option.path]
      * @param {String} [option.scheme]
-     * @returns {Array} midllewares
+     * @param {String} [option.flow]
+     * @returns {Promise<any[]>} midllewares
      */
     init(cfg?: any, option?: {
         path?: string;
         scheme?: string;
-    }): any[];
+        flow?: string;
+    }): Promise<any[]>;
     loadTags(topics: any, metadata: any): any[];
-    loadDescription(metadata?: {}): any;
-    loadConfig({ path }: {
+    loadDescription(metadata?: {}): Promise<any>;
+    loadConfig({ path, flow }: {
         path: any;
+        flow: any;
     }): any;
     middlewares(): any;
 }

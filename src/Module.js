@@ -120,6 +120,11 @@ class DocumentModule extends ksdp.integration.Dip {
      */
     template;
 
+    /**
+     * @type {String}
+     */
+    sessionKey = "docs";
+
     constructor() {
         super();
         this.cfg = { ...TConfig };
@@ -219,6 +224,7 @@ class DocumentModule extends ksdp.integration.Dip {
             option.path instanceof Object && Object.assign(this.path, option.path);
             option.route instanceof Object && Object.assign(this.route, option.route);
             option.template instanceof Object && Object.assign(this.template, option.template);
+            option.sessionKey && (this.sessionKey = option.sessionKey);            
         }
         this.configService?.configure({
             path: this.path,

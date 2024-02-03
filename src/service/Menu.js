@@ -5,6 +5,12 @@ const _fsp = _fs.promises;
 
 class MenuService {
     /**
+     * @description logger
+     * @type {Object}
+     */
+    logger;
+
+    /**
      * @description all path 
      * @type {Object}
      */
@@ -76,8 +82,10 @@ class MenuService {
     /**
      * @description get the list of topics to the menu
      * @param {Array<Object>|String} source 
-     * @param {Function|null} [render] 
-     * @param {Boolean|null} [onlyDir] 
+     * @param {Object} option 
+     * @param {Function|null} [option.render] 
+     * @param {Function|null} [option.filter] 
+     * @param {Boolean|null} [option.onlyDir] 
      * @returns {Promise<Array<any>>}
      */
     async loadDir(source, { render = null, onlyDir = false, filter }) {

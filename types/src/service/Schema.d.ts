@@ -1,6 +1,6 @@
-export = ContentService;
-declare const ContentService_base: typeof import("ksdp/types/src/integration/Dip");
-declare class ContentService extends ContentService_base {
+export = SchemaService;
+declare const SchemaService_base: typeof import("ksdp/types/src/integration/Dip");
+declare class SchemaService extends SchemaService_base {
     /**
      * @description Config service
      * @type {Object|null}

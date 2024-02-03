@@ -34,6 +34,20 @@ class SwaggerController extends ksdp.integration.Dip {
      */
     path;
 
+    /**
+     * @description Content Service
+     * @type {Object|null}
+     */
+    contentService;
+
+    /**
+     * @description Data Service
+     * @type {Object|null}
+     */
+    dataService;
+
+
+
     constructor() {
         super();
         this.serve = swaggerUi.serve;
@@ -54,8 +68,9 @@ class SwaggerController extends ksdp.integration.Dip {
      * @param {Object} [cfg] 
      * @param {Object} [option] 
      * @param {String} [option.path] 
-     * @param {String} [option.scheme] 
-     * @returns {Array} midllewares
+     * @param {String} [option.scheme]
+     * @param {String} [option.flow] 
+     * @returns {Promise<any[]>} midllewares
      */
     async init(cfg = null, option = null) {
         const config = this.loadConfig(option);

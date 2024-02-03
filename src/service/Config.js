@@ -13,6 +13,13 @@ class ConfigService {
      * @type {Object}
      */
     path;
+    
+    /**
+     * @description logger
+     * @type {Object}
+     */
+    logger;
+
 
     /**
      * 

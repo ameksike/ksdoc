@@ -9,6 +9,12 @@ class SchemaController extends ksdp.integration.Dip {
     configService;
 
     /**
+     * @description Content Service
+     * @type {ContentService|null}
+     */
+    contentService;
+
+    /**
      * @type {Console|null}
      */
     logger = null;
@@ -46,8 +52,8 @@ class SchemaController extends ksdp.integration.Dip {
 
     /**
      * @description render the document content 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async show(req, res) {
         let token = this.sessionService?.getToken(req);
@@ -58,8 +64,8 @@ class SchemaController extends ksdp.integration.Dip {
 
     /**
      * @description add or update documents 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async save(req, res) {
         let params = utl.getFrom(req)
@@ -95,8 +101,8 @@ class SchemaController extends ksdp.integration.Dip {
 
     /**
      * @description delete documents 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async delete(req, res) {
         try {

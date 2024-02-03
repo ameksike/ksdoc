@@ -2,7 +2,7 @@ const _fs = require('fs');
 const _fsp = _fs.promises;
 const _path = require('path');
 const ksdp = require('ksdp');
-const utl = require('ksdocs/src/utl');
+const utl = require('../utl');
 
 class SchemaService extends ksdp.integration.Dip {
 
