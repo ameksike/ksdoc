@@ -104,7 +104,16 @@ class SchemaService extends ksdp.integration.Dip {
         }
     }
 
-    searchTpl({ pageid, path, scheme }) {
+    /**
+     * @description get the page metadata 
+     * @param {Object} payload 
+     * @param {String} [payload.pageid] 
+     * @param {String} [payload.scheme] 
+     * @param {String} [payload.path] 
+     * @returns {Object} page metadata
+     */
+    searchTpl(payload) {
+        let { pageid, path, scheme } = payload || {};
         let route = { ...this.path, scheme };
         let tpl = utl.mix(this.template[pageid], route);
         let isFragment = !tpl || /snippet\..*/.test(tpl);
@@ -118,7 +127,20 @@ class SchemaService extends ksdp.integration.Dip {
         };
     }
 
-    async getContent({ pageid, flow, token, page, path, scheme, data }) {
+    /**
+     * @description get html content 
+     * @param {Object} [payload]
+     * @param {String} [payload.pageid] 
+     * @param {String} [payload.scheme] 
+     * @param {String} [payload.token] 
+     * @param {String} [payload.flow] 
+     * @param {String} [payload.path] 
+     * @param {Object} [payload.page] 
+     * @param {Object} [payload.data] 
+     * @returns {Promise<String>} html
+     */
+    async getContent(payload = {}) {
+        let { pageid, page, path, scheme, data } = payload || {}
         if (!pageid && page) {
             return '';
         }

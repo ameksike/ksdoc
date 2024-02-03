@@ -117,8 +117,20 @@ class ContentService extends ksdp.integration.Dip {
             ext
         };
     }
-
-    async getContent({ pageid, flow, token, page, path, scheme, data }) {
+    /**
+     * @description get html content
+     * @param {Object} [payload]
+     * @param {String} [payload.pageid]
+     * @param {String} [payload.scheme]
+     * @param {String} [payload.path]
+     * @param {Object} [payload.page]
+     * @param {Object} [payload.data]
+     * @param {String} [payload.flow]
+     * @param {String} [payload.token]
+     * @returns {Promise<String>} html
+     */
+    async getContent(payload = {}) {
+        let { pageid, page, path, scheme, data } = payload || {};
         if (!pageid && page) {
             return '';
         }
