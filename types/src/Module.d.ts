@@ -3,14 +3,24 @@ declare const DocumentModule_base: typeof import("ksdp/types/src/integration/Dip
 declare class DocumentModule extends DocumentModule_base {
     /**
      * @description Document Controller
-     * @type {DocumentController|null}
+     * @type {ContentController|null}
      */
-    controller: DocumentController | null;
+    contentController: ContentController | null;
+    /**
+     * @description Schema Controller
+     * @type {SchemaController|null}
+     */
+    schemaController: SchemaController | null;
     /**
      * @description Document Controller
      * @type {SwaggerController|null}
      */
     apiController: SwaggerController | null;
+    /**
+     * @description Content Service
+     * @type {SchemaService|null}
+     */
+    schemaService: SchemaService | null;
     /**
      * @description Content Service
      * @type {ContentService|null}
@@ -77,6 +87,13 @@ declare class DocumentModule extends DocumentModule_base {
      */
     template: any;
     /**
+     * @description resolve URL
+     * @param {String} key
+     * @param {Object} option
+     * @returns {String} url
+     */
+    getRoute(key: string, option: any): string;
+    /**
      * @description configure the Document module
      * @param {Object} option
      * @returns {DocumentModule} self
@@ -90,8 +107,10 @@ declare class DocumentModule extends DocumentModule_base {
      */
     init(app: any, publish?: Function | null, cfg?: any | null): this;
 }
-import DocumentController = require("./controller/Document");
+import ContentController = require("./controller/Content");
+import SchemaController = require("./controller/Schema");
 import SwaggerController = require("./controller/Swagger");
+import SchemaService = require("./service/Schema");
 import ContentService = require("./service/Content");
 import SessionService = require("./service/Session");
 import ConfigService = require("./service/Config");

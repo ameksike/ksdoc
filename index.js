@@ -6,10 +6,12 @@ module.exports = new (class extends Document {
             Document
         },
         controller: {
-            Document: require('./src/controller/Document'),
+            Schema: require('./src/controller/Schema'),
+            Content: require('./src/controller/Content'),
             Swagger: require('./src/controller/Swagger'),
         },
         service: {
+            Schema: require('./src/service/Schema'),
             Content: require('./src/service/Content'),
             Session: require('./src/service/Session'),
             Language: require('./src/service/Language'),

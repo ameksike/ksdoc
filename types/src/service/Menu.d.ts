@@ -25,10 +25,11 @@ declare class MenuService {
      * @type {Object|null}
      */
     logger: any | null;
-    configure({ path, route, cfg }: {
+    configure({ path, route, cfg, logger }: {
         path: any;
         route: any;
         cfg: any;
+        logger: any;
     }): void;
     /**
      * @description check the user session
@@ -37,21 +38,30 @@ declare class MenuService {
      * @param {Object} [payload.path]
      * @param {Object} [payload.route]
      * @param {Object} [payload.cfg]
+     * @param {Function} [payload.action]
      * @param {Object|String} [payload.source]
      * @returns {Promise<any>} config
      */
-    load({ scheme, path, route, cfg, source }: {
+    load({ scheme, path, route, cfg, source, action }: {
         scheme?: string;
         path?: any;
         route?: any;
         cfg?: any;
+        action?: Function;
         source?: any | string;
     }): Promise<any>;
     /**
      * @description get the list of topics to the menu
      * @param {Array<Object>|String} source
-     * @param {Function|null} [render]
-     * @returns {Promise<any>}
+     * @param {Object} option
+     * @param {Function|null} [option.render]
+     * @param {Function|null} [option.filter]
+     * @param {Boolean|null} [option.onlyDir]
+     * @returns {Promise<Array<any>>}
      */
-    loadDir(source: Array<any> | string, render?: Function | null): Promise<any>;
+    loadDir(source: Array<any> | string, { render, onlyDir, filter }: {
+        render?: Function | null;
+        filter?: Function | null;
+        onlyDir?: boolean | null;
+    }): Promise<Array<any>>;
 }

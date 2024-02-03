@@ -15,6 +15,13 @@ class ConfigService {
     path;
 
     /**
+     * @description logger
+     * @type {Object}
+     */
+    logger;
+
+
+    /**
      * 
      * @param {Object} payload 
      * @param {String} [payload.filename] 
@@ -30,26 +37,31 @@ class ConfigService {
      * @param {Object} payload 
      * @param {String} [payload.filename] 
      * @param {String} [payload.path] 
+     * @param {Object} [payload.logger] 
      * @returns {ConfigService} self
      */
-    configure({ filename, path }) {
+    configure({ filename, path, logger }) {
         this.filename = filename || this.filename;
         this.path = path || this.path;
+        this.logger = logger || this.logger;
         return this;
     }
 
     /**
      * @description check the user session
      * @param {Object} payload 
-     * @param {String} payload.scheme 
-     * @param {String} payload.filename 
-     * @param {String} payload.type 
-     * @param {Object} target
+     * @param {String} [payload.scheme]
+     * @param {String} [payload.filename]
+     * @param {String} [payload.file]
+     * @param {String} [payload.path]
+     * @param {String} [payload.type] 
+     * @param {Object} [target]
      * @returns {Promise<any>} config
      */
-    async load({ scheme, filename, type }, target) {
+    async load({ scheme, file, filename, path, type }, target) {
         try {
-            let file = _path.join(utl.mix(this.path.core, { ...this.path, scheme }), filename || this.filename);
+            let paths = { ...this.path, scheme };
+            file = file || _path.join(utl.mix(path || this.path.core, paths), filename || this.filename);
             let data = await this.readFile(file + (type || ".json"), type || "json");
             data = data || await this.readFile(file);
             if (target) {

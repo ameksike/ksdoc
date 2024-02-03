@@ -4,7 +4,7 @@ const _path = require('path');
 const ksdp = require('ksdp');
 const utl = require('../utl');
 
-class ContentService extends ksdp.integration.Dip {
+class SchemaService extends ksdp.integration.Dip {
 
     /**
      * @description Config service
@@ -139,27 +139,50 @@ class ContentService extends ksdp.integration.Dip {
      * @param {Object} [payload.account] 
      * @param {Object} [payload.query] 
      * @param {Object} [payload.dataSrv] 
-     * @param {Object} [payload.config] 
      * @returns {Promise<String>} content
      */
     async select(payload) {
-        let { pageid, scheme, flow, token, account, query, dataSrv, config } = payload || {};
+        let { pageid = "home", scheme = "home", flow, token, account, query, dataSrv } = payload || {};
         pageid = pageid || this.template.default;
-        config = config || await this.configService?.load({ scheme }, this);
+        await this.configService?.load({ scheme }, this);
 
         let idiom = account?.lang || payload?.query?.idiom || "en";
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
         let route = { ...this.route, scheme };
-        let [lang, cont] = await Promise.all([
+
+        let [lang, cont, menu] = await Promise.all([
             this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, scheme }), idiom }),
-            dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, scheme, flow, token })
+            dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, scheme, flow, token }),
+            await this.menuService?.loadDir(this.path.root, {
+                onlyDir: true,
+                filter: (item) => {
+                    if (item.name === "home") {
+                        return false;
+                    }
+                    return !query?.search ? item : new RegExp(".*" + query?.search + ".*", "gi").test(item.name);
+                },
+                render: async (item) => {
+                    let artConf = await this.configService?.load({ scheme: item.name });
+                    let metadata = artConf?.metadata || { scheme: item.name };
+                    let delta = Math.abs(Date.now() - parseInt(metadata.date)) / (1000 * 60 * 60 * 24);
+                    metadata.scheme = item.name;
+                    metadata.name = metadata.name || metadata.scheme;
+                    metadata.group = metadata.group || "community";
+                    metadata.url = utl.mix(this.route.home, { ...this.route, scheme: item.name });
+                    delta < 10 && (metadata.badge = {
+                        class: delta < 5 ? "new" : "hot",
+                        title: delta < 5 ? "new" : "hot"
+                    });
+                    return metadata;
+                }
+            })
         ]);
 
         let data = {
-            title: config?.metadata?.name,
             lang,
             token,
             ...query,
+            menu,
             account: {
                 name: account?.user?.firstName || "Guest"
             },
@@ -168,22 +191,10 @@ class ContentService extends ksdp.integration.Dip {
                 access: utl.mix(this.route.access, route),
                 logout: utl.mix(this.route.logout, route),
                 login: utl.mix(this.route.login, route),
-                home: utl.mix(this.route.home, route),
-                page: utl.mix(this.route.home, route),
-                api: utl.mix(this.route.api, route),
-                src: utl.mix(this.route.src, route),
             },
             ...cont
         }
-
-        if (this.cfg?.scope !== "public" && this.cfg?.scope !== undefined) {
-            return this.getContent({ pageid: "404", flow, token, data });
-        }
-        let [content, menu] = await Promise.all([
-            this.getContent({ scheme, pageid, flow, token, page, data }),
-            !page.isFragment ? Promise.resolve([]) : this.menuService?.load({ scheme, cfg: config?.cfg, path: this.path, route: this.route })
-        ]);
-        content = content || await this.getContent({ scheme, pageid: "main", flow, token, page, data });
+        let content = await this.getContent({ scheme, pageid, flow, token, page, data });
         return !page.isFragment ? content : this.renderLayout({ content, scheme, account, menu, data });
     }
 
@@ -193,18 +204,18 @@ class ContentService extends ksdp.integration.Dip {
      * @returns {Promise<String>}
      */
     renderLayout(payload = {}) {
-        const { data, content = "", menu, scheme = "view", scripts = "", styles = "" } = payload || {};
+        const { data, content = "", menu, scheme = "view", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, scheme });
         const pageOption = this.getBuildOption({ page, scheme, force: true });
         return this.tplService.render(
             page.name,
             {
                 menu,
+                title,
                 styles,
                 scripts,
                 content,
-                ...data,
-                title: data?.lang?.title || data?.title || "API DOC",
+                ...data
             },
             pageOption
         );
@@ -225,4 +236,4 @@ class ContentService extends ksdp.integration.Dip {
     }
 }
 
-module.exports = ContentService;
+module.exports = SchemaService;

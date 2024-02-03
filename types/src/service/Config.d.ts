@@ -20,30 +20,41 @@ declare class ConfigService {
      */
     path: any;
     /**
+     * @description logger
+     * @type {Object}
+     */
+    logger: any;
+    /**
      * @description configure the service
      * @param {Object} payload
      * @param {String} [payload.filename]
      * @param {String} [payload.path]
+     * @param {Object} [payload.logger]
      * @returns {ConfigService} self
      */
-    configure({ filename, path }: {
+    configure({ filename, path, logger }: {
         filename?: string;
         path?: string;
+        logger?: any;
     }): ConfigService;
     /**
      * @description check the user session
      * @param {Object} payload
-     * @param {String} payload.scheme
-     * @param {String} payload.filename
-     * @param {String} payload.type
-     * @param {Object} target
+     * @param {String} [payload.scheme]
+     * @param {String} [payload.filename]
+     * @param {String} [payload.file]
+     * @param {String} [payload.path]
+     * @param {String} [payload.type]
+     * @param {Object} [target]
      * @returns {Promise<any>} config
      */
-    load({ scheme, filename, type }: {
-        scheme: string;
-        filename: string;
-        type: string;
-    }, target: any): Promise<any>;
+    load({ scheme, file, filename, path, type }: {
+        scheme?: string;
+        filename?: string;
+        file?: string;
+        path?: string;
+        type?: string;
+    }, target?: any): Promise<any>;
     /**
      * @description read objects from file
      * @param {String} file

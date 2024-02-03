@@ -1,6 +1,6 @@
-export = ContentService;
-declare const ContentService_base: typeof import("ksdp/types/src/integration/Dip");
-declare class ContentService extends ContentService_base {
+export = SchemaService;
+declare const SchemaService_base: typeof import("ksdp/types/src/integration/Dip");
+declare class SchemaService extends SchemaService_base {
     /**
      * @description Config service
      * @type {Object|null}
@@ -89,7 +89,6 @@ declare class ContentService extends ContentService_base {
      * @param {Object} [payload.account]
      * @param {Object} [payload.query]
      * @param {Object} [payload.dataSrv]
-     * @param {Object} [payload.config]
      * @returns {Promise<String>} content
      */
     select(payload?: {
@@ -101,7 +100,6 @@ declare class ContentService extends ContentService_base {
         account?: any;
         query?: any;
         dataSrv?: any;
-        config?: any;
     }): Promise<string>;
     /**
      * @description build layout page

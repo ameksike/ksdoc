@@ -23,6 +23,16 @@ declare class SwaggerController extends SwaggerController_base {
      * @type {Object}
      */
     path: any;
+    /**
+     * @description Content Service
+     * @type {Object|null}
+     */
+    contentService: any | null;
+    /**
+     * @description Data Service
+     * @type {Object|null}
+     */
+    dataService: any | null;
     serve: any;
     /**
      * @description configure the SwaggerController module
@@ -31,20 +41,46 @@ declare class SwaggerController extends SwaggerController_base {
      */
     configure(option: any): SwaggerController;
     /**
+     * @description initialize the swagger
      * @param {Object} [cfg]
      * @param {Object} [option]
      * @param {String} [option.path]
      * @param {String} [option.scheme]
-     * @returns {Array} midllewares
+     * @param {String} [option.flow]
+     * @returns {Promise<any[]>} midllewares
      */
     init(cfg?: any, option?: {
         path?: string;
         scheme?: string;
-    }): any[];
-    loadTags(topics: any, metadata: any): any[];
-    loadDescription(metadata?: {}): any;
-    loadConfig({ path }: {
-        path: any;
+        flow?: string;
+    }): Promise<any[]>;
+    /**
+     * @description
+     * @param {*} topics
+     * @param {*} metadata
+     * @returns {Array<any>}
+     */
+    loadTags(topics: any, metadata: any): Array<any>;
+    /**
+     * @description load description
+     * @param {Object} metadata
+     * @returns {Promise<string>} description
+     */
+    loadDescription(metadata?: any): Promise<string>;
+    /**
+     * @description load config
+     * @param {Object} payload
+     * @param {String} [payload.flow]
+     * @param {String} [payload.path]
+     * @param {String} [payload.file]
+     * @param {String} [payload.filename]
+     * @returns {Object} config
+     */
+    loadConfig({ path, flow, file, filename }: {
+        flow?: string;
+        path?: string;
+        file?: string;
+        filename?: string;
     }): any;
     middlewares(): any;
 }

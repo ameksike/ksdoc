@@ -5,7 +5,7 @@ const utl = ksmf.app.Utl.self();
 const uri = ksmf.app.Url.self();
 const uts = require('../utl');
 
-class DocumentController extends ksdp.integration.Dip {
+class ContentController extends ksdp.integration.Dip {
 
     /**
      * @description Document Controller
@@ -22,10 +22,6 @@ class DocumentController extends ksdp.integration.Dip {
      * @type {Object|null}
      */
     sessionService = null;
-    /**
-     * @type {String}
-     */
-    sessionKey = "docs";
 
     /**
      * @type {Object|null}
@@ -50,23 +46,84 @@ class DocumentController extends ksdp.integration.Dip {
     route;
 
     /**
+     * @description all configurations 
+     * @type {Object}
+     */
+    cfg;
+
+    /**
      * @description render the document content 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async show(req, res) {
-        let token = this.sessionService?.getToken(req);
-        let account = this.sessionService?.account(req, this.sessionKey);
-        let pageid = req.params.id || "";
-        let scheme = req.params.scheme;
-        let layout = await this.contentService.select({ token, account, pageid, scheme, query: req.query });
-        res.send(layout);
+        try {
+            let scheme = req.params.scheme;
+            let config = req.config = req.config || await this.configService?.load({ scheme }, this.contentService);
+            let token = this.sessionService?.getToken(req);
+            let account = this.sessionService?.account(req, this.cfg?.session?.key);
+            let pageid = req.params.id || "";
+            let layout = await this.contentService.select({ token, account, pageid, scheme, query: req.query, config });
+            res.send(layout);
+        }
+        catch (error) {
+            this.logger?.error({
+                flow: req.flow,
+                src: "KsDoc:check",
+                error: { message: error?.message || error, stack: error?.stack },
+                data: req.body
+            });
+            res.status(500).end();
+        }
+
+    }
+
+    /**
+     * @description check user sessions 
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     */
+    async check(req, res, next) {
+        try {
+            let scheme = req.params.scheme;
+            let config = req.config = req.config || await this.configService?.load({ scheme }, this.contentService);
+            if (!this.sessionService || !config?.cfg?.auth?.required) {
+                return next();
+            }
+            let option = {
+                scheme,
+                pageid: req.params.id,
+                originalUrl: req.url || req.originalUrl,
+                redirectUrl: uts.mix(this.route.access, { ...this.route, scheme }),
+                key: this.cfg?.session?.key,
+                mode: 'simple'
+            }
+            const validated = await this.sessionService?.check(option, { req, res, next });
+            if (validated !== undefined) {
+                if (validated) {
+                    return next();
+                } else {
+                    this.sessionService?.create(req, this.cfg?.session?.key, { originalUrl: option.originalUrl });
+                    return res.redirect(uri.add(option.redirectUrl, { msg: "error_invalid_user", ...req.query }, req));
+                }
+            }
+        }
+        catch (error) {
+            this.logger?.error({
+                flow: req.flow,
+                src: "KsDoc:check",
+                error: { message: error?.message || error, stack: error?.stack },
+                data: req.body
+            });
+            next();
+        }
     }
 
     /**
      * @description add or update documents 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async save(req, res) {
         let params = utl.getFrom(req)
@@ -102,8 +159,8 @@ class DocumentController extends ksdp.integration.Dip {
 
     /**
      * @description delete documents 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async delete(req, res) {
         try {
@@ -137,16 +194,17 @@ class DocumentController extends ksdp.integration.Dip {
     }
 
     /**
-     * @description 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @description show the login page
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async access(req, res) {
         try {
-            let token = this.sessionService?.getToken(req);
-            let account = this.sessionService?.account(req, this.sessionKey);
             let scheme = req.params.scheme;
-            let layout = await this.contentService.select({ token, account, pageid: "login", scheme, query: req.query });
+            let config = req.config = req.config || await this.configService?.load({ scheme }, this.contentService);
+            let token = this.sessionService?.getToken(req);
+            let account = this.sessionService?.account(req, this.cfg?.session?.key);
+            let layout = await this.contentService.select({ token, account, pageid: "login", scheme, query: req.query, config });
             res.send(layout);
         }
         catch (error) {
@@ -156,7 +214,7 @@ class DocumentController extends ksdp.integration.Dip {
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
-            this.sessionService?.remove(req, this.sessionKey);
+            this.sessionService?.remove(req, this.cfg?.session?.key);
             res.status(500).send({
                 success: false,
                 msg: "E_BAD_REQUEST",
@@ -168,6 +226,20 @@ class DocumentController extends ksdp.integration.Dip {
      * @description login action
      * @param {Object} req 
      * @param {String} [req.flow] 
+     * @param {Object} [req.body] 
+     * @param {String} [req.body.client_id] 
+     * @param {String} [req.body.client_secret] 
+     * @param {String} [req.body.username] 
+     * @param {String} [req.body.password] 
+     * @param {String} [req.body.scope] 
+     * @param {String} [req.body.user_agent] 
+     * @param {String} [req.body.grant_type] 
+     * @param {Object} [req.query] 
+     * @param {String} [req.query.redirectUrl] 
+     * @param {String} [req.query.scheme] 
+     * @param {String} [req.query.mode] 
+     * @param {Object} [req.headers] 
+     * @param {Object} [req.params] 
      * @param {Object} res 
      */
     async login(req, res) {
@@ -189,8 +261,8 @@ class DocumentController extends ksdp.integration.Dip {
             if (!payload) {
                 throw new Error("Authentication Failed");
             }
-            this.sessionService?.create(req, this.sessionKey, { access_token: payload.access_token, flow: req.flow });
-            let sess = this.sessionService?.account(req, this.sessionKey);
+            this.sessionService?.create(req, this.cfg?.session?.key, { access_token: payload.access_token, flow: req.flow });
+            let sess = this.sessionService?.account(req, this.cfg?.session?.key);
             let orgu = sess?.originalUrl || req.query.redirectUrl;
             let rurl = orgu && orgu !== "/" ? orgu : uts.mix(this.route.home, { ...this.route, scheme });
             this.logger?.info({
@@ -204,7 +276,7 @@ class DocumentController extends ksdp.integration.Dip {
             res.redirect(rurl);
         }
         catch (error) {
-            this.sessionService?.remove(req, this.sessionKey);
+            this.sessionService?.remove(req, this.cfg?.session?.key);
             let urlr = uts.mix(this.route.unauthorized, { ...this.route, scheme });
             urlr = uri.add(urlr, { msg: "Invalid user" }, req);
             this.logger?.error({
@@ -222,11 +294,13 @@ class DocumentController extends ksdp.integration.Dip {
      * @param {Object} req 
      * @param {String} [req.flow] 
      * @param {Object} [req.body] 
+     * @param {Object} [req.params] 
+     * @param {String} [req.params.scheme] 
      * @param {Object} res 
      */
     async logout(req, res) {
         try {
-            this.sessionService?.remove(req, this.sessionKey);
+            this.sessionService?.remove(req, this.cfg?.session?.key);
             const scheme = req.params.scheme;
             const redurectUrl = uts.mix(this.route.unauthorized, { ...this.route, scheme });
             res.redirect(redurectUrl);
@@ -246,4 +320,4 @@ class DocumentController extends ksdp.integration.Dip {
     }
 }
 
-module.exports = DocumentController;
+module.exports = ContentController;

@@ -19,12 +19,33 @@ export type TCls<T> = new (...args: any[]) => T;
  */
 export function build<T>(cls: TCls<T>, args?: any[]): T;
 export namespace TConfig {
+    let menu: any;
+    namespace session {
+        let key: string;
+    }
+    namespace schema {
+        let _default: string;
+        export { _default as default };
+    }
+    namespace metadata {
+        let name: string;
+        let description: string;
+        let version: string;
+        let icon: string;
+        let image: string;
+        let group: string;
+        let date: string;
+    }
+}
+export namespace TConfigAPI {
     namespace swaggerDefinition {
         let openapi: string;
         let tags: any[];
         namespace info {
-            let version: string;
-            let description: string;
+            let version_1: string;
+            export { version_1 as version };
+            let description_1: string;
+            export { description_1 as description };
         }
         let basePath: string;
         let servers: {

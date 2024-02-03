@@ -4,10 +4,12 @@ declare const _exports: {
             Document: typeof Document;
         };
         controller: {
-            Document: typeof import("./src/controller/Document");
+            Schema: typeof import("./src/controller/Schema");
+            Content: typeof import("./src/controller/Content");
             Swagger: typeof import("./src/controller/Swagger");
         };
         service: {
+            Schema: typeof import("./src/service/Schema");
             Content: typeof import("./src/service/Content");
             Session: typeof import("./src/service/Session");
             Language: typeof import("./src/service/Language");
@@ -18,8 +20,10 @@ declare const _exports: {
             FormData: typeof import("./src/middleware/FormData");
         };
     };
-    controller: import("./src/controller/Document");
+    contentController: import("./src/controller/Content");
+    schemaController: import("./src/controller/Schema");
     apiController: import("./src/controller/Swagger");
+    schemaService: import("./src/service/Schema");
     contentService: import("./src/service/Content");
     sessionService: import("./src/service/Session");
     configService: import("./src/service/Config");
@@ -33,6 +37,7 @@ declare const _exports: {
     path: any;
     route: any;
     template: any;
+    getRoute(key: string, option: any): string;
     configure(option: any): Document;
     init(app: any, publish?: Function, cfg?: any): {
         cls: {
@@ -40,10 +45,12 @@ declare const _exports: {
                 Document: typeof Document;
             };
             controller: {
-                Document: typeof import("./src/controller/Document");
+                Schema: typeof import("./src/controller/Schema");
+                Content: typeof import("./src/controller/Content");
                 Swagger: typeof import("./src/controller/Swagger");
             };
             service: {
+                Schema: typeof import("./src/service/Schema");
                 Content: typeof import("./src/service/Content");
                 Session: typeof import("./src/service/Session");
                 Language: typeof import("./src/service/Language");
@@ -54,8 +61,10 @@ declare const _exports: {
                 FormData: typeof import("./src/middleware/FormData");
             };
         };
-        controller: import("./src/controller/Document");
+        contentController: import("./src/controller/Content");
+        schemaController: import("./src/controller/Schema");
         apiController: import("./src/controller/Swagger");
+        schemaService: import("./src/service/Schema");
         contentService: import("./src/service/Content");
         sessionService: import("./src/service/Session");
         configService: import("./src/service/Config");
@@ -69,6 +78,7 @@ declare const _exports: {
         path: any;
         route: any;
         template: any;
+        getRoute(key: string, option: any): string;
         configure(option: any): Document;
         init(app: any, publish?: Function, cfg?: any): any;
         setDependencies(options: any): any;
