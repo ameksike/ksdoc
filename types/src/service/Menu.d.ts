@@ -25,10 +25,11 @@ declare class MenuService {
      * @type {Object|null}
      */
     logger: any | null;
-    configure({ path, route, cfg }: {
+    configure({ path, route, cfg, logger }: {
         path: any;
         route: any;
         cfg: any;
+        logger: any;
     }): void;
     /**
      * @description check the user session

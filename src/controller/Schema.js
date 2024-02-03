@@ -1,5 +1,8 @@
 const ksdp = require('ksdp');
+const ksmf = require('ksmf');
+
 const uts = require('../utl');
+const utl = ksmf.app.Utl.self();
 
 class SchemaController extends ksdp.integration.Dip {
 
@@ -8,6 +11,12 @@ class SchemaController extends ksdp.integration.Dip {
      * @type {Object|null}
      */
     configService;
+
+    /**
+     * @description Content Service
+     * @type {Object|null}
+     */
+    contentService;
 
     /**
      * @type {Console|null}
@@ -40,6 +49,12 @@ class SchemaController extends ksdp.integration.Dip {
      * @type {Object}
      */
     route;
+
+    /**
+     * @description all configurations 
+     * @type {Object}
+     */
+    cfg;
 
     /**
      * @description render the document content 

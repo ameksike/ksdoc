@@ -46,8 +46,6 @@ class SwaggerController extends ksdp.integration.Dip {
      */
     dataService;
 
-
-
     constructor() {
         super();
         this.serve = swaggerUi.serve;
@@ -65,6 +63,7 @@ class SwaggerController extends ksdp.integration.Dip {
     }
 
     /**
+     * @description initialize the swagger 
      * @param {Object} [cfg] 
      * @param {Object} [option] 
      * @param {String} [option.path] 
@@ -89,15 +88,33 @@ class SwaggerController extends ksdp.integration.Dip {
         return delegate;
     }
 
+    /**
+     * @description 
+     * @param {*} topics 
+     * @param {*} metadata 
+     * @returns {Array<any>}
+     */
     loadTags(topics, metadata) {
         return [];
     }
 
+    /**
+     * @description load description
+     * @param {Object} metadata 
+     * @returns {Promise<string>} description
+     */
     async loadDescription(metadata = {}) {
         const des = await this.contentService.select(metadata);
         return des.replace(/[\r\n]/gi, " ");
     }
 
+    /**
+     * @description load config 
+     * @param {Object} payload 
+     * @param {String} [payload.flow]
+     * @param {String} [payload.path]
+     * @returns {Object} config
+     */
     loadConfig({ path, flow }) {
         try {
             const config = require(_path.join(path, "config.json"));

@@ -35,10 +35,11 @@ class MenuService {
         this.path = path || {};
     }
 
-    configure({ path, route, cfg }) {
+    configure({ path, route, cfg, logger }) {
         this.route = cfg || this.cfg;
         this.route = route || this.route;
         this.path = path || this.path;
+        this.logger = logger || this.logger;
     }
 
     /**

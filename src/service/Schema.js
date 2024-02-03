@@ -164,7 +164,7 @@ class SchemaService extends ksdp.integration.Dip {
                 render: async (item) => {
                     let artConf = await this.configService?.load({ scheme: item.name });
                     let metadata = artConf?.metadata || { scheme: item.name };
-                    let delta = Math.abs(Date.now() - (new Date(parseInt(metadata.date)))) / (1000 * 60 * 60 * 24);
+                    let delta = Math.abs(Date.now() - parseInt(metadata.date)) / (1000 * 60 * 60 * 24);
                     metadata.scheme = item.name;
                     metadata.name = metadata.name || metadata.scheme;
                     metadata.group = metadata.group || "community";

@@ -33,11 +33,16 @@ declare class ContentController extends ContentController_base {
      */
     route: any;
     /**
-     * @description render the document content
-     * @param {Request} req
-     * @param {Response} res
+     * @description all configurations
+     * @type {Object}
      */
-    show(req: Request, res: Response): Promise<void>;
+    cfg: any;
+    /**
+     * @description render the document content
+     * @param {Object} req
+     * @param {Object} res
+     */
+    show(req: any, res: any): Promise<void>;
     /**
      * @description check user sessions
      * @param {*} req
@@ -47,32 +52,60 @@ declare class ContentController extends ContentController_base {
     check(req: any, res: any, next: any): Promise<void>;
     /**
      * @description add or update documents
-     * @param {Request} req
-     * @param {Response} res
+     * @param {Object} req
+     * @param {Object} res
      */
-    save(req: Request, res: Response): Promise<any>;
+    save(req: any, res: any): Promise<any>;
     /**
      * @description delete documents
-     * @param {Request} req
-     * @param {Response} res
+     * @param {Object} req
+     * @param {Object} res
      */
-    delete(req: Request, res: Response): Promise<any>;
+    delete(req: any, res: any): Promise<any>;
     /**
-     * @description
-     * @param {Request} req
-     * @param {Response} res
+     * @description show the login page
+     * @param {Object} req
+     * @param {Object} res
      */
-    access(req: Request, res: Response): Promise<void>;
+    access(req: any, res: any): Promise<void>;
     /**
      * @description login action
      * @param {Object} req
      * @param {String} [req.flow]
-     * @param {String} [req.body]
+     * @param {Object} [req.body]
+     * @param {String} [req.body.client_id]
+     * @param {String} [req.body.client_secret]
+     * @param {String} [req.body.username]
+     * @param {String} [req.body.password]
+     * @param {String} [req.body.scope]
+     * @param {String} [req.body.user_agent]
+     * @param {String} [req.body.grant_type]
+     * @param {Object} [req.query]
+     * @param {String} [req.query.redirectUrl]
+     * @param {String} [req.query.scheme]
+     * @param {String} [req.query.mode]
+     * @param {Object} [req.headers]
+     * @param {Object} [req.params]
      * @param {Object} res
      */
     login(req: {
         flow?: string;
-        body?: string;
+        body?: {
+            client_id?: string;
+            client_secret?: string;
+            username?: string;
+            password?: string;
+            scope?: string;
+            user_agent?: string;
+            grant_type?: string;
+        };
+        query?: {
+            redirectUrl?: string;
+            scheme?: string;
+            mode?: string;
+        };
+        headers?: any;
+        params?: any;
     }, res: any): Promise<void>;
     /**
      *

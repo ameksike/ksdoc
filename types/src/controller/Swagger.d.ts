@@ -41,6 +41,7 @@ declare class SwaggerController extends SwaggerController_base {
      */
     configure(option: any): SwaggerController;
     /**
+     * @description initialize the swagger
      * @param {Object} [cfg]
      * @param {Object} [option]
      * @param {String} [option.path]
@@ -53,11 +54,29 @@ declare class SwaggerController extends SwaggerController_base {
         scheme?: string;
         flow?: string;
     }): Promise<any[]>;
-    loadTags(topics: any, metadata: any): any[];
-    loadDescription(metadata?: {}): Promise<any>;
+    /**
+     * @description
+     * @param {*} topics
+     * @param {*} metadata
+     * @returns {Array<any>}
+     */
+    loadTags(topics: any, metadata: any): Array<any>;
+    /**
+     * @description load description
+     * @param {Object} metadata
+     * @returns {Promise<string>} description
+     */
+    loadDescription(metadata?: any): Promise<string>;
+    /**
+     * @description load config
+     * @param {Object} payload
+     * @param {String} [payload.flow]
+     * @param {String} [payload.path]
+     * @returns {Object} config
+     */
     loadConfig({ path, flow }: {
-        path: any;
-        flow: any;
+        flow?: string;
+        path?: string;
     }): any;
     middlewares(): any;
 }

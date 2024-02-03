@@ -7,6 +7,11 @@ declare class SchemaController extends SchemaController_base {
      */
     configService: any | null;
     /**
+     * @description Content Service
+     * @type {Object|null}
+     */
+    contentService: any | null;
+    /**
      * @type {Console|null}
      */
     logger: Console | null;
@@ -32,6 +37,11 @@ declare class SchemaController extends SchemaController_base {
      * @type {Object}
      */
     route: any;
+    /**
+     * @description all configurations
+     * @type {Object}
+     */
+    cfg: any;
     /**
      * @description render the document content
      * @param {Object} req

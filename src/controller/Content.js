@@ -46,9 +46,15 @@ class ContentController extends ksdp.integration.Dip {
     route;
 
     /**
+     * @description all configurations 
+     * @type {Object}
+     */
+    cfg;
+
+    /**
      * @description render the document content 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async show(req, res) {
         let token = this.sessionService?.getToken(req);
@@ -101,8 +107,8 @@ class ContentController extends ksdp.integration.Dip {
 
     /**
      * @description add or update documents 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async save(req, res) {
         let params = utl.getFrom(req)
@@ -138,8 +144,8 @@ class ContentController extends ksdp.integration.Dip {
 
     /**
      * @description delete documents 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async delete(req, res) {
         try {
@@ -173,9 +179,9 @@ class ContentController extends ksdp.integration.Dip {
     }
 
     /**
-     * @description 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @description show the login page
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async access(req, res) {
         try {
@@ -204,7 +210,20 @@ class ContentController extends ksdp.integration.Dip {
      * @description login action
      * @param {Object} req 
      * @param {String} [req.flow] 
-     * @param {String} [req.body] 
+     * @param {Object} [req.body] 
+     * @param {String} [req.body.client_id] 
+     * @param {String} [req.body.client_secret] 
+     * @param {String} [req.body.username] 
+     * @param {String} [req.body.password] 
+     * @param {String} [req.body.scope] 
+     * @param {String} [req.body.user_agent] 
+     * @param {String} [req.body.grant_type] 
+     * @param {Object} [req.query] 
+     * @param {String} [req.query.redirectUrl] 
+     * @param {String} [req.query.scheme] 
+     * @param {String} [req.query.mode] 
+     * @param {Object} [req.headers] 
+     * @param {Object} [req.params] 
      * @param {Object} res 
      */
     async login(req, res) {

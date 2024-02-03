@@ -37,11 +37,13 @@ class ConfigService {
      * @param {Object} payload 
      * @param {String} [payload.filename] 
      * @param {String} [payload.path] 
+     * @param {Object} [payload.logger] 
      * @returns {ConfigService} self
      */
-    configure({ filename, path }) {
+    configure({ filename, path, logger }) {
         this.filename = filename || this.filename;
         this.path = path || this.path;
+        this.logger = logger || this.logger;
         return this;
     }
 

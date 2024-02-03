@@ -29,11 +29,13 @@ declare class ConfigService {
      * @param {Object} payload
      * @param {String} [payload.filename]
      * @param {String} [payload.path]
+     * @param {Object} [payload.logger]
      * @returns {ConfigService} self
      */
-    configure({ filename, path }: {
+    configure({ filename, path, logger }: {
         filename?: string;
         path?: string;
+        logger?: any;
     }): ConfigService;
     /**
      * @description check the user session
