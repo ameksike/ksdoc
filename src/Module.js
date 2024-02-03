@@ -120,15 +120,9 @@ class DocumentModule extends ksdp.integration.Dip {
      */
     template;
 
-    /**
-     * @type {String}
-     */
-    sessionKey = "docs";
-
     constructor() {
         super();
         this.cfg = { ...TConfig };
-        this.defaultSchema = '';
         this.path = {
             lib: __dirname,
             root: path.join(__dirname, '../../../docs'),
@@ -150,7 +144,6 @@ class DocumentModule extends ksdp.integration.Dip {
             access: '{root}/{scheme}/sec/access',
             unauthorized: '{root}/{scheme}/sec/access',
             // partials
-            default: '{root}/{scheme}',
             public: '{resource}/{scheme}',
             home: '{root}/{scheme}',
             pag: '{root}/{scheme}/{page}',
@@ -224,7 +217,6 @@ class DocumentModule extends ksdp.integration.Dip {
             option.path instanceof Object && Object.assign(this.path, option.path);
             option.route instanceof Object && Object.assign(this.route, option.route);
             option.template instanceof Object && Object.assign(this.template, option.template);
-            option.sessionKey && (this.sessionKey = option.sessionKey);            
         }
         this.configService?.configure({
             path: this.path,
@@ -238,27 +230,27 @@ class DocumentModule extends ksdp.integration.Dip {
             cfg: this.cfg
         });
         const diService = {
-            menuService: this.menuService || null,
-            configService: this.configService || null,
             languageService: this.languageService || null,
+            configService: this.configService || null,
+            menuService: this.menuService || null,
             dataService: this.dataService || null,
             tplService: this.tplService || null,
-            logger: this.logger || null,
             template: this.template,
+            logger: this.logger || null,
             route: this.route,
             path: this.path,
             cfg: this.cfg
         };
         const diController = {
-            dataService: this.dataService || null,
-            configService: this.configService || null,
+            sessionService: this.sessionService || null,
             contentService: this.contentService || null,
             schemaService: this.schemaService || null,
-            sessionService: this.sessionService || null,
+            configService: this.configService || null,
             authService: this.authService || null,
             logger: this.logger || null,
             route: this.route,
             path: this.path,
+            cfg: this.cfg
         };
         this.contentService?.inject(diService);
         this.schemaService?.inject(diService);

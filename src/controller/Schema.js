@@ -1,4 +1,5 @@
 const ksdp = require('ksdp');
+const uts = require('../utl');
 
 class SchemaController extends ksdp.integration.Dip {
 
@@ -7,12 +8,6 @@ class SchemaController extends ksdp.integration.Dip {
      * @type {Object|null}
      */
     configService;
-
-    /**
-     * @description Content Service
-     * @type {ContentService|null}
-     */
-    contentService;
 
     /**
      * @type {Console|null}
@@ -56,6 +51,10 @@ class SchemaController extends ksdp.integration.Dip {
      * @param {Object} res 
      */
     async show(req, res) {
+        if (this.cfg?.schema?.default) {
+            let redirectURl = uts.mix(this.route.home, { ...this.route, scheme: this.cfg.schema.default });
+            return res.redirect(redirectURl);
+        }
         let token = this.sessionService?.getToken(req);
         let account = this.sessionService?.account(req, this.sessionKey);
         let layout = await this.schemaService.select({ token, account, query: req.query });
@@ -64,8 +63,8 @@ class SchemaController extends ksdp.integration.Dip {
 
     /**
      * @description add or update documents 
-     * @param {Object} req 
-     * @param {Object} res 
+     * @param {Request} req 
+     * @param {Response} res 
      */
     async save(req, res) {
         let params = utl.getFrom(req)
@@ -101,8 +100,8 @@ class SchemaController extends ksdp.integration.Dip {
 
     /**
      * @description delete documents 
-     * @param {Object} req 
-     * @param {Object} res 
+     * @param {Request} req 
+     * @param {Response} res 
      */
     async delete(req, res) {
         try {

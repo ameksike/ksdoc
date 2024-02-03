@@ -180,7 +180,7 @@ class ContentService extends ksdp.integration.Dip {
         }
         let [content, menu] = await Promise.all([
             this.getContent({ scheme, pageid, flow, token, page, data }),
-            !page.isFragment ? Promise.resolve([]) : this.menuService?.load({ scheme, cfg: schemeConfig.cfg, path: this.path, route: this.route })
+            !page.isFragment ? Promise.resolve([]) : this.menuService?.load({ scheme, cfg: schemeConfig?.cfg, path: this.path, route: this.route })
         ]);
         content = content || await this.getContent({ scheme, pageid: "main", flow, token, page, data });
         return !page.isFragment ? content : this.renderLayout({ content, scheme, account, menu, data });
