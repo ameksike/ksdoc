@@ -28,9 +28,9 @@ declare class DocumentModule extends DocumentModule_base {
     contentService: ContentService | null;
     /**
      * @description Session Service
-     * @type {SessionService|null}
+     * @type {Object|null}
      */
-    sessionService: SessionService | null;
+    sessionService: any | null;
     /**
      * @description Config Service
      * @type {ConfigService|null}
@@ -112,7 +112,6 @@ import SchemaController = require("./controller/Schema");
 import SwaggerController = require("./controller/Swagger");
 import SchemaService = require("./service/Schema");
 import ContentService = require("./service/Content");
-import SessionService = require("./service/Session");
 import ConfigService = require("./service/Config");
 import LanguageService = require("./service/Language");
 import MenuService = require("./service/Menu");
