@@ -156,6 +156,9 @@ class SchemaService extends ksdp.integration.Dip {
             await this.menuService?.loadDir(this.path.root, {
                 onlyDir: true,
                 filter: (item) => {
+                    if (item.name === "home") {
+                        return false;
+                    }
                     return !query?.search ? item : new RegExp(".*" + query?.search + ".*", "gi").test(item.name);
                 },
                 render: async (item) => {

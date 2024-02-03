@@ -135,6 +135,9 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        .uppercase {
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
@@ -172,8 +175,8 @@
                         <span class="article-label {{item.badge.class}}">{{item.badge.title}}</span>
                         {% endif %}
                         <!-- img src="article1.jpg" alt="image" -->
-                        <h5 class="truncated-with">{{item.group}}</h5>
-                        <h3 class="truncated-with">{{item.name}}</h3>
+                        <span class="truncated-with uppercase badge rounded-pill bg-secondary">{{item.group}}</span>
+                        <h3 class="truncated-with uppercase">{{item.name}}</h3>
                         <p class="truncated-heigh">{{item.description}}</p>
                     </div>
                     <div class="mt-auto">
