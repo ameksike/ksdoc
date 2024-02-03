@@ -40,14 +40,14 @@ declare class SchemaController extends SchemaController_base {
     show(req: any, res: any): Promise<any>;
     /**
      * @description add or update documents
-     * @param {Request} req
-     * @param {Response} res
+     * @param {Object} req
+     * @param {Object} res
      */
-    save(req: Request, res: Response): Promise<any>;
+    save(req: any, res: any): Promise<any>;
     /**
      * @description delete documents
-     * @param {Request} req
-     * @param {Response} res
+     * @param {Object} req
+     * @param {Object} res
      */
-    delete(req: Request, res: Response): Promise<any>;
+    delete(req: any, res: any): Promise<any>;
 }

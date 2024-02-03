@@ -150,7 +150,7 @@ class SchemaService extends ksdp.integration.Dip {
         let page = this.searchTpl({ pageid, path: this.path.page, scheme });
         let route = { ...this.route, scheme };
 
-        let [lang, cont, articles] = await Promise.all([
+        let [lang, cont, menu] = await Promise.all([
             this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, scheme }), idiom }),
             dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, scheme, flow, token }),
             await this.menuService?.loadDir(this.path.root, {
@@ -182,7 +182,7 @@ class SchemaService extends ksdp.integration.Dip {
             lang,
             token,
             ...query,
-            articles,
+            menu,
             account: {
                 name: account?.user?.firstName || "Guest"
             },

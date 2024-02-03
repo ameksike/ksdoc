@@ -59,8 +59,8 @@ class SchemaController extends ksdp.integration.Dip {
 
     /**
      * @description add or update documents 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async save(req, res) {
         let params = utl.getFrom(req)
@@ -96,8 +96,8 @@ class SchemaController extends ksdp.integration.Dip {
 
     /**
      * @description delete documents 
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Object} req 
+     * @param {Object} res 
      */
     async delete(req, res) {
         try {
