@@ -7,11 +7,6 @@ declare class SchemaController extends SchemaController_base {
      */
     configService: any | null;
     /**
-     * @description Content Service
-     * @type {ContentService|null}
-     */
-    contentService: ContentService | null;
-    /**
      * @type {Console|null}
      */
     logger: Console | null;
@@ -46,17 +41,17 @@ declare class SchemaController extends SchemaController_base {
      * @param {Object} req
      * @param {Object} res
      */
-    show(req: any, res: any): Promise<void>;
+    show(req: any, res: any): Promise<any>;
     /**
      * @description add or update documents
-     * @param {Object} req
-     * @param {Object} res
+     * @param {Request} req
+     * @param {Response} res
      */
-    save(req: any, res: any): Promise<any>;
+    save(req: Request, res: Response): Promise<any>;
     /**
      * @description delete documents
-     * @param {Object} req
-     * @param {Object} res
+     * @param {Request} req
+     * @param {Response} res
      */
-    delete(req: any, res: any): Promise<any>;
+    delete(req: Request, res: Response): Promise<any>;
 }

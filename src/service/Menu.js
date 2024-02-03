@@ -4,11 +4,6 @@ const _fs = require('fs');
 const _fsp = _fs.promises;
 
 class MenuService {
-    /**
-     * @description logger
-     * @type {Object}
-     */
-    logger;
 
     /**
      * @description all path 

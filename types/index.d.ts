@@ -37,8 +37,6 @@ declare const _exports: {
     path: any;
     route: any;
     template: any;
-    sessionKey: string;
-    defaultSchema: string;
     getRoute(key: string, option: any): string;
     configure(option: any): Document;
     init(app: any, publish?: Function, cfg?: any): {
@@ -80,8 +78,6 @@ declare const _exports: {
         path: any;
         route: any;
         template: any;
-        sessionKey: string;
-        defaultSchema: string;
         getRoute(key: string, option: any): string;
         configure(option: any): Document;
         init(app: any, publish?: Function, cfg?: any): any;

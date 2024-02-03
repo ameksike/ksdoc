@@ -87,11 +87,6 @@ declare class DocumentModule extends DocumentModule_base {
      */
     template: any;
     /**
-     * @type {String}
-     */
-    sessionKey: string;
-    defaultSchema: string;
-    /**
      * @description resolve URL
      * @param {String} key
      * @param {Object} option
