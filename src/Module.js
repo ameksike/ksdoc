@@ -1,6 +1,7 @@
 const ksdp = require('ksdp');
 const path = require('path');
 const kstpl = require('kstpl');
+const ksmf = require('ksmf');
 // controllers 
 const ContentController = require('./controller/Content');
 const SwaggerController = require('./controller/Swagger');
@@ -8,10 +9,10 @@ const SchemaController = require('./controller/Schema');
 // services 
 const SchemaService = require('./service/Schema');
 const ContentService = require('./service/Content');
-const SessionService = require('./service/Session');
 const LanguageService = require('./service/Language');
 const ConfigService = require('./service/Config');
 const MenuService = require('./service/Menu');
+const SessionService = ksmf.monitor.Session;
 // utils 
 const formDataMw = require('./middleware/FormData');
 const { TConfig } = require('./types');
@@ -50,7 +51,7 @@ class DocumentModule extends ksdp.integration.Dip {
 
     /**
      * @description Session Service
-     * @type {SessionService|null}
+     * @type {Object|null}
      */
     sessionService;
 
@@ -253,6 +254,9 @@ class DocumentModule extends ksdp.integration.Dip {
             path: this.path,
             cfg: this.cfg
         };
+        this.sessionService?.inject({
+            authService: this.authService || null
+        });
         this.contentService?.inject(diService);
         this.schemaService?.inject(diService);
         this.schemaController?.inject(diController);

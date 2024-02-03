@@ -25,7 +25,7 @@ declare const _exports: {
     apiController: import("./src/controller/Swagger");
     schemaService: import("./src/service/Schema");
     contentService: import("./src/service/Content");
-    sessionService: import("./src/service/Session");
+    sessionService: any;
     configService: import("./src/service/Config");
     languageService: import("./src/service/Language");
     menuService: import("./src/service/Menu");
@@ -66,7 +66,7 @@ declare const _exports: {
         apiController: import("./src/controller/Swagger");
         schemaService: import("./src/service/Schema");
         contentService: import("./src/service/Content");
-        sessionService: import("./src/service/Session");
+        sessionService: any;
         configService: import("./src/service/Config");
         languageService: import("./src/service/Language");
         menuService: import("./src/service/Menu");

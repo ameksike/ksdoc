@@ -58,26 +58,40 @@ declare class SchemaService extends SchemaService_base {
     template: any | null;
     delete(payload: any): Promise<any>;
     save(payload: any): Promise<any>;
-    searchTpl({ pageid, path, scheme }: {
-        pageid: any;
-        path: any;
-        scheme: any;
-    }): {
-        exist: boolean;
-        isFragment: boolean;
-        name: any;
-        path: string;
-        ext: string;
-    };
-    getContent({ pageid, flow, token, page, path, scheme, data }: {
-        pageid: any;
-        flow: any;
-        token: any;
-        page: any;
-        path: any;
-        scheme: any;
-        data: any;
-    }): Promise<any>;
+    /**
+     * @description get the page metadata
+     * @param {Object} payload
+     * @param {String} [payload.pageid]
+     * @param {String} [payload.scheme]
+     * @param {String} [payload.path]
+     * @returns {Object} page metadata
+     */
+    searchTpl(payload: {
+        pageid?: string;
+        scheme?: string;
+        path?: string;
+    }): any;
+    /**
+     * @description get html content
+     * @param {Object} [payload]
+     * @param {String} [payload.pageid]
+     * @param {String} [payload.scheme]
+     * @param {String} [payload.token]
+     * @param {String} [payload.flow]
+     * @param {String} [payload.path]
+     * @param {Object} [payload.page]
+     * @param {Object} [payload.data]
+     * @returns {Promise<String>} html
+     */
+    getContent(payload?: {
+        pageid?: string;
+        scheme?: string;
+        token?: string;
+        flow?: string;
+        path?: string;
+        page?: any;
+        data?: any;
+    }): Promise<string>;
     /**
      * @description get content to render
      * @param {Object} [payload]

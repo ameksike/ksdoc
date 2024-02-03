@@ -69,15 +69,27 @@ declare class ContentService extends ContentService_base {
         path: string;
         ext: string;
     };
-    getContent({ pageid, flow, token, page, path, scheme, data }: {
-        pageid: any;
-        flow: any;
-        token: any;
-        page: any;
-        path: any;
-        scheme: any;
-        data: any;
-    }): Promise<any>;
+    /**
+     * @description get html content
+     * @param {Object} [payload]
+     * @param {String} [payload.pageid]
+     * @param {String} [payload.scheme]
+     * @param {String} [payload.path]
+     * @param {Object} [payload.page]
+     * @param {Object} [payload.data]
+     * @param {String} [payload.flow]
+     * @param {String} [payload.token]
+     * @returns {Promise<String>} html
+     */
+    getContent(payload?: {
+        pageid?: string;
+        scheme?: string;
+        path?: string;
+        page?: any;
+        data?: any;
+        flow?: string;
+        token?: string;
+    }): Promise<string>;
     /**
      * @description get content to render
      * @param {Object} [payload]
