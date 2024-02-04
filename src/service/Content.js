@@ -107,13 +107,15 @@ class ContentService extends ksdp.integration.Dip {
     searchTpl({ pageid, path, schema }) {
         let route = { ...this.path, schema };
         let tpl = utl.mix(this.template[pageid], route);
-        let isFragment = !tpl || /snippet\..*/.test(tpl);
+        let isFragment = !tpl || /[snippet|README]\..*/i.test(tpl);
         let ext = !isFragment || !!tpl || /\.(md|twig|html|ejs|tpl)$/i.test(pageid) ? "" : "html";
         return {
             exist: !!tpl,
             isFragment,
             name: tpl ? _path.basename(tpl) : pageid,
-            path: tpl ? _path.dirname(tpl) : _path.resolve(utl.mix(path, route) || ""),
+            path: tpl ? _path.dirname(tpl) : (schema === "ksdoc" 
+                ? _path.join(__dirname, "../../doc/page") 
+                : _path.resolve(utl.mix(path, route))),
             ext
         };
     }
@@ -122,6 +124,7 @@ class ContentService extends ksdp.integration.Dip {
      * @param {Object} [payload]
      * @param {String} [payload.pageid]
      * @param {String} [payload.schema]
+     * @param {String} [payload.lang]
      * @param {String} [payload.path]
      * @param {Object} [payload.page]
      * @param {Object} [payload.data]
@@ -130,12 +133,12 @@ class ContentService extends ksdp.integration.Dip {
      * @returns {Promise<String>} html
      */
     async getContent(payload = {}) {
-        let { pageid, page, path, schema, data } = payload || {};
+        let { pageid, page, path, schema, data, lang } = payload || {};
         if (!pageid && page) {
             return '';
         }
         page = page || this.searchTpl({ pageid, path, schema });
-        let pageOption = this.getBuildOption({ page, schema });
+        let pageOption = this.getBuildOption({ page, schema, lang });
         let content = await this.tplService.render(page.name, data, pageOption);
         return content;
     }
@@ -145,6 +148,7 @@ class ContentService extends ksdp.integration.Dip {
      * @param {Object} [payload]
      * @param {String} [payload.pageid]
      * @param {String} [payload.schema] 
+     * @param {String} [payload.lang] 
      * @param {String} [payload.flow] 
      * @param {String} [payload.idm] 
      * @param {String} [payload.token] 
@@ -155,13 +159,13 @@ class ContentService extends ksdp.integration.Dip {
      * @returns {Promise<String>} content
      */
     async select(payload) {
-        let { pageid, schema, flow, token, account, query, dataSrv, config } = payload || {};
+        let { pageid, schema, flow, token, account, query, dataSrv, config, lang: idiom } = payload || {};
         pageid = pageid || this.template.default;
         config = config || await this.configService?.load({ schema }, this);
 
-        let idiom = account?.lang || payload?.query?.idiom || "en";
+        idiom = idiom || account?.lang || payload?.query?.idiom || "en";
         let page = this.searchTpl({ pageid, path: this.path.page, schema });
-        let route = { ...this.route, schema };
+        let route = { ...this.route, schema, lang: idiom };
         let [lang, cont] = await Promise.all([
             this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, schema }), idiom }),
             dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, schema, flow, token })
@@ -192,14 +196,14 @@ class ContentService extends ksdp.integration.Dip {
         }
 
         if (this.cfg?.scope !== "public" && this.cfg?.scope !== undefined) {
-            return this.getContent({ pageid: "404", flow, token, data });
+            return this.getContent({ pageid: "404", lang: idiom, flow, token, data });
         }
         let [content, menu] = await Promise.all([
-            this.getContent({ schema, pageid, flow, token, page, data }),
-            !page.isFragment ? Promise.resolve([]) : this.menuService?.load({ schema, cfg: config?.cfg, path: this.path, route: this.route })
+            this.getContent({ schema, lang: idiom, pageid, flow, token, page, data }),
+            !page.isFragment ? Promise.resolve([]) : this.menuService?.load({ schema, lang: idiom, cfg: config?.cfg, path: this.path, route: this.route })
         ]);
-        content = content || await this.getContent({ schema, pageid: "main", flow, token, page, data });
-        return !page.isFragment ? content : this.renderLayout({ content, schema, account, menu, data });
+        content = content || await this.getContent({ schema, lang: idiom, pageid: "main", flow, token, page, data });
+        return !page.isFragment ? content : this.renderLayout({ content, schema, lang: idiom, account, menu, data });
     }
 
     /**
@@ -208,9 +212,9 @@ class ContentService extends ksdp.integration.Dip {
      * @returns {Promise<String>}
      */
     renderLayout(payload = {}) {
-        const { data, content = "", menu, schema = "view", scripts = "", styles = "" } = payload || {};
+        const { data, content = "", lang = "en", menu, schema = "view", scripts = "", styles = "" } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, schema });
-        const pageOption = this.getBuildOption({ page, schema, force: true });
+        const pageOption = this.getBuildOption({ page, schema, force: true, lang });
         return this.tplService.render(
             page.name,
             {
@@ -230,10 +234,10 @@ class ContentService extends ksdp.integration.Dip {
      * @param {Object} payload 
      * @returns {Object} options
      */
-    getBuildOption({ schema, page, force }) {
+    getBuildOption({ schema, page, force, lang }) {
         let cache = null;
         if ((force === undefined || force === false) && this.path?.cache) {
-            const cachePath = _path.resolve(utl.mix(this.path.cache, { ...this.path, schema }));
+            const cachePath = _path.join(utl.mix(this.path.cache, { ...this.path, schema }), lang);
             cache = { cacheExt: "html", cacheType: "file", cachePath };
         }
         return { path: page.path, ext: page.ext, ...cache };

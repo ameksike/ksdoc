@@ -60,7 +60,9 @@ class ConfigService {
     async load({ schema, file, filename, path, type }, target) {
         try {
             let paths = { ...this.path, schema };
-            file = file || _path.join(utl.mix(path || this.path.core, paths), filename || this.filename);
+            file = file || (schema === "ksdoc"
+                ? _path.join(__dirname, "../../doc/core", filename || this.filename)
+                : _path.join(utl.mix(path || this.path.core, paths), filename || this.filename));
             let data = await utl.fileRead(file + (type || ".json"));
             data = data || await utl.fileRead(file);
             if (target) {

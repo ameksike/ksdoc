@@ -35,6 +35,7 @@ declare class MenuService {
      * @description check the user session
      * @param {Object} payload
      * @param {String} [payload.schema]
+     * @param {String} [payload.lang]
      * @param {Object} [payload.path]
      * @param {Object} [payload.route]
      * @param {Object} [payload.cfg]
@@ -42,8 +43,9 @@ declare class MenuService {
      * @param {Object|String} [payload.source]
      * @returns {Promise<any>} config
      */
-    load({ schema, path, route, cfg, source, action }: {
+    load({ schema, lang, path, route, cfg, source, action }: {
         schema?: string;
+        lang?: string;
         path?: any;
         route?: any;
         cfg?: any;
@@ -57,11 +59,13 @@ declare class MenuService {
      * @param {Function|null} [option.render]
      * @param {Function|null} [option.filter]
      * @param {Boolean|null} [option.onlyDir]
+     * @param {Array<any>} [option.extra]
      * @returns {Promise<Array<any>>}
      */
-    loadDir(source: Array<any> | string, { render, onlyDir, filter }: {
+    loadDir(source: Array<any> | string, { render, onlyDir, filter, extra }: {
         render?: Function | null;
         filter?: Function | null;
         onlyDir?: boolean | null;
+        extra?: Array<any>;
     }): Promise<Array<any>>;
 }

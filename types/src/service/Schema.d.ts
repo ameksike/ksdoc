@@ -81,6 +81,7 @@ declare class SchemaService extends SchemaService_base {
      * @param {String} [payload.path]
      * @param {Object} [payload.page]
      * @param {Object} [payload.data]
+     * @param {Object} [payload.lang]
      * @returns {Promise<String>} html
      */
     getContent(payload?: {
@@ -91,6 +92,7 @@ declare class SchemaService extends SchemaService_base {
         path?: string;
         page?: any;
         data?: any;
+        lang?: any;
     }): Promise<string>;
     /**
      * @description get content to render
@@ -103,6 +105,7 @@ declare class SchemaService extends SchemaService_base {
      * @param {Object} [payload.account]
      * @param {Object} [payload.query]
      * @param {Object} [payload.dataSrv]
+     * @param {String} [payload.lang]
      * @returns {Promise<String>} content
      */
     select(payload?: {
@@ -114,6 +117,7 @@ declare class SchemaService extends SchemaService_base {
         account?: any;
         query?: any;
         dataSrv?: any;
+        lang?: string;
     }): Promise<string>;
     /**
      * @description build layout page
@@ -126,5 +130,5 @@ declare class SchemaService extends SchemaService_base {
      * @param {Object} payload
      * @returns {Object} options
      */
-    getBuildOption({ schema, page, force }: any): any;
+    getBuildOption({ schema, lang, page, force }: any): any;
 }

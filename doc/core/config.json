@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "name": "KsDocs",
+    "description": "KsDoc is a versatile library within the Ksike ecosystem, designed to streamline and simplify the documentation process.",
+    "group": "Ksike"
+  },
+  "cfg": {
+    "scope": "public",
+    "auth": {
+      "required": false
+    }
+  },
+  "template": {
+    "layout": "{lib}/template/page.layout.html",
+    "desc": "{lib}/template/fragment.des.html",
+    "main": "{lib}/../README.md"
+  }
+}

@@ -22,12 +22,14 @@ class Language {
      * @param {Object} [option]
      * @param {String} [option.path]
      * @param {String} [option.idiom]
+     * @param {String} [option.schema]
      * @param {String} [option.extension]
      * @returns {Promise<Object>}
      */
     load(option) {
-        const { path, idiom = "en", extension } = option || {};
-        const file = _path.join(path, (idiom || this.default) + "." + (extension || this.extension));
+        const { path, idiom = "en", extension, schema } = option || {};
+        const filename = (idiom || this.default) + "." + (extension || this.extension);
+        const file = schema === "ksdoc" ? _path.join(__dirname, "../../doc/lang", filename) : _path.join(path, filename);
         return utl.fileRead(file);
     }
 }

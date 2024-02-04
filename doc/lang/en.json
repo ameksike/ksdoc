@@ -1,0 +1,30 @@
+{
+  "title": "Unlock Knowledge with Ksike Docs",
+  "description": "KsDoc is a versatile library within the Ksike ecosystem, designed to streamline and simplify the documentation process.",
+  "welcome": "Welcome",
+  "exit": "Exit",
+  "portal": {
+	"title": "Unlock Knowledge with Ksike Docs",
+	"subtitle": "Explore insightful articles on various topics. Manage and read articles with ease. Stay informed and inspired.",
+	"search": "Search",
+	"searchPlaceholder": "Search for articles...",
+	"marketing": {
+		"title": "Why Choose Ksike Docs?",
+		"advantage1": {
+		  "title": "Discover Insights",
+		  "description": "Explore articles that provide valuable insights and perspectives on diverse topics."
+		},
+		"advantage2": {
+		  "title": "Stay Informed",
+		  "description": "Stay up-to-date with the latest information and trends in your area of interest."
+		},
+		"advantage3": {
+		  "title": "User-Friendly",
+		  "description": "Our platform is designed with a focus on user experience, making article management and reading a breeze."
+		}
+	},
+	"btn": {
+		"readmore": "Read More"
+	}
+  }
+}
