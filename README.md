@@ -36,7 +36,7 @@ const app = express();
 ksdocs.inject({
     path: {
       ...ksdocs.path,
-      root: config.paths.docs
+      root: __dirname + "/docs"
     },
 }).init(app, express.static);
 
