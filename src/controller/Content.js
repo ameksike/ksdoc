@@ -59,11 +59,12 @@ class ContentController extends ksdp.integration.Dip {
     async show(req, res) {
         try {
             let schema = req.params.schema;
+            let lang = req.params.lang;
             let config = req.ksdoc;
             let token = this.sessionService?.getToken(req);
             let account = this.sessionService?.account(req, this.cfg?.session?.key);
             let pageid = req.params.id || "";
-            let layout = await this.contentService.select({ token, account, pageid, schema, query: req.query, config });
+            let layout = await this.contentService.select({ token, account, pageid, schema, lang, query: req.query, config });
             res.send(layout);
         }
         catch (error) {
@@ -87,6 +88,7 @@ class ContentController extends ksdp.integration.Dip {
     async check(req, res, next) {
         try {
             let schema = req.params.schema;
+            let lang = req.params.lang;
             let config = req.ksdoc;
             if (!this.sessionService || !config?.cfg?.auth?.required) {
                 return next();
@@ -95,7 +97,7 @@ class ContentController extends ksdp.integration.Dip {
                 schema,
                 pageid: req.params.id,
                 originalUrl: req.url || req.originalUrl,
-                redirectUrl: uts.mix(this.route.access, { ...this.route, schema }),
+                redirectUrl: uts.mix(this.route.access, { ...this.route, schema, lang }),
                 key: this.cfg?.session?.key,
                 mode: 'simple'
             }
@@ -201,10 +203,11 @@ class ContentController extends ksdp.integration.Dip {
     async access(req, res) {
         try {
             let schema = req.params.schema;
+            let lang = req.params.lang;
             let config = req.ksdoc;
             let token = this.sessionService?.getToken(req);
             let account = this.sessionService?.account(req, this.cfg?.session?.key);
-            let layout = await this.contentService.select({ token, account, pageid: "login", schema, query: req.query, config });
+            let layout = await this.contentService.select({ token, account, pageid: "login", schema, lang, query: req.query, config });
             res.send(layout);
         }
         catch (error) {
@@ -244,6 +247,7 @@ class ContentController extends ksdp.integration.Dip {
      */
     async login(req, res) {
         let schema = req.params.schema;
+        let lang = req.params.lang;
         try {
             if (req.body.grant_type !== "password") {
                 throw new Error("Incorrect Grant Type");
@@ -261,10 +265,10 @@ class ContentController extends ksdp.integration.Dip {
             if (!payload) {
                 throw new Error("Authentication Failed");
             }
-            this.sessionService?.create(req, this.cfg?.session?.key, { access_token: payload.access_token, flow: req.flow });
+            this.sessionService?.create(req, this.cfg?.session?.key, { access_token: payload.access_token, flow: req.flow, lang });
             let sess = this.sessionService?.account(req, this.cfg?.session?.key);
             let orgu = sess?.originalUrl || req.query.redirectUrl;
-            let rurl = orgu && orgu !== "/" ? orgu : uts.mix(this.route.home, { ...this.route, schema });
+            let rurl = orgu && orgu !== "/" ? orgu : uts.mix(this.route.home, { ...this.route, schema, lang });
             this.logger?.info({
                 flow: req.flow,
                 src: "KsDoc:login",
@@ -277,7 +281,7 @@ class ContentController extends ksdp.integration.Dip {
         }
         catch (error) {
             this.sessionService?.remove(req, this.cfg?.session?.key);
-            let urlr = uts.mix(this.route.unauthorized, { ...this.route, schema });
+            let urlr = uts.mix(this.route.unauthorized, { ...this.route, schema, lang });
             urlr = uri.add(urlr, { msg: "Invalid user" }, req);
             this.logger?.error({
                 flow: req.flow,
@@ -296,13 +300,15 @@ class ContentController extends ksdp.integration.Dip {
      * @param {Object} [req.body] 
      * @param {Object} [req.params] 
      * @param {String} [req.params.schema] 
+     * @param {String} [req.params.lang] 
      * @param {Object} res 
      */
     async logout(req, res) {
         try {
             this.sessionService?.remove(req, this.cfg?.session?.key);
             const schema = req.params.schema;
-            const redurectUrl = uts.mix(this.route.unauthorized, { ...this.route, schema });
+            const lang = req.params.lang;
+            const redurectUrl = uts.mix(this.route.unauthorized, { ...this.route, schema, lang });
             res.redirect(redurectUrl);
         }
         catch (error) {

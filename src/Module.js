@@ -128,28 +128,30 @@ class DocumentModule extends ksdp.integration.Dip {
             lib: __dirname,
             root: path.join(__dirname, '../../../docs'),
             // partials
-            api: '{root}/{schema}/api',
-            page: '{root}/{schema}/page',
-            lang: '{root}/{schema}/lang',
-            config: '{root}/{schema}/config',
-            resource: '{root}/{schema}/resource',
-            core: '{root}/{schema}/core',
-            cache: '{core}/cache',
+            "api": "{root}/{schema}/api",
+            "page": "{root}/{schema}/page",
+            "lang": "{root}/{schema}/lang",
+            "config": "{root}/{schema}/config",
+            "resource": "{root}/{schema}/resource",
+            "core": "{root}/{schema}/core",
+            "cache": "{core}/cache",
         };
         this.route = {
-            root: '/doc',
-            resource: '/resource',
-            // security
-            login: '{root}/{schema}/sec/login',
-            logout: '{root}/{schema}/sec/logout',
-            access: '{root}/{schema}/sec/access',
-            unauthorized: '{root}/{schema}/sec/access',
+            "lang": "en",
+            "root": "/doc",
+            "resource": "/resource",
             // partials
-            public: '{resource}/{schema}',
-            home: '{root}/{schema}',
-            pag: '{root}/{schema}/{page}',
-            api: '{root}/{schema}/api',
-            src: '{root}/{schema}/src',
+            "base": "{root}/{lang}",
+            "public": "{resource}/{schema}",
+            "home": "{base}/{schema}",
+            "pag": "{base}/{schema}/{page}",
+            "api": "{base}/{schema}/api",
+            "src": "{base}/{schema}/src",
+            // security
+            "login": "{base}/{schema}/sec/login",
+            "logout": "{base}/{schema}/sec/logout",
+            "access": "{base}/{schema}/sec/access",
+            "unauthorized": "{base}/{schema}/sec/access",
         };
         this.template = {
             default: 'main',
@@ -302,7 +304,7 @@ class DocumentModule extends ksdp.integration.Dip {
         if (typeof app?.use !== "function" || typeof app?.post !== "function") {
             return this;
         }
-        const routed = { ...this.route, schema: ":schema" };
+        const routed = { ...this.route, schema: ":schema", lang: ":lang" };
         const mwCheck = (req, res, next) => this.delegate(req, res, next, "contentController", "check");
         const mwFormData = formDataMw?.support();
         // Resources URL
@@ -324,6 +326,7 @@ class DocumentModule extends ksdp.integration.Dip {
             async (req, res, next) => {
                 await this.load(req);
                 const schema = req.params.schema;
+                const lang = req.params.lang;
                 const token = this.sessionService?.getToken(req);
                 const account = this.sessionService?.account(req, this.cfg?.session?.key);
                 const option = {
@@ -332,20 +335,22 @@ class DocumentModule extends ksdp.integration.Dip {
                     schema,
                     token,
                     flow: req.flow,
-                    path: path.resolve(utl.mix(this.path?.api, { ...this.path, schema }))
+                    path: path.resolve(utl.mix(this.path?.api, { ...this.path, schema, lang }))
                 };
                 const action = await this.apiController?.init(this.cfg, option, req.ksdoc);
                 action instanceof Function && action(req, res, next);
             }
         );
         // Content URL 
-        app.get(this.route.root + "/:schema/:id", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "show"));
-        app.delete(this.route.root + "/:schema/:id", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "delete"));
-        app.post(this.route.root + "/:schema/:id", mwCheck, mwFormData, (req, res, next) => this.delegate(req, res, next, "contentController", "save"));
-        app.put(this.route.root + "/:schema/:id", mwCheck, mwFormData, (req, res, next) => this.delegate(req, res, next, "contentController", "save"));
-        app.get(this.route.root + "/:schema", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "show"));
+        let baseUrl = this.getRoute("base", { lang: ":lang" });
+        app.get(baseUrl + "/:schema/:id", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "show"));
+        app.delete(baseUrl + "/:schema/:id", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "delete"));
+        app.post(baseUrl + "/:schema/:id", mwCheck, mwFormData, (req, res, next) => this.delegate(req, res, next, "contentController", "save"));
+        app.put(baseUrl + "/:schema/:id", mwCheck, mwFormData, (req, res, next) => this.delegate(req, res, next, "contentController", "save"));
+        app.get(baseUrl + "/:schema", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "show"));
         // schema URL 
-        app.get(this.route.root, (req, res, next) => this.delegate(req, res, next, "schemaController", "show"));
+        app.get(baseUrl, (req, res, next) => this.delegate(req, res, next, "schemaController", "show"));
+        app.get(this.getRoute("root"), (req, res, next) => res.redirect(this.getRoute("base")));
     }
 }
 

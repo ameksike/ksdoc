@@ -137,15 +137,16 @@ class SchemaService extends ksdp.integration.Dip {
      * @param {String} [payload.path] 
      * @param {Object} [payload.page] 
      * @param {Object} [payload.data] 
+     * @param {Object} [payload.lang] 
      * @returns {Promise<String>} html
      */
     async getContent(payload = {}) {
-        let { pageid, page, path, schema, data } = payload || {}
+        let { pageid, page, path, schema, lang, data } = payload || {}
         if (!pageid && page) {
             return '';
         }
         page = page || this.searchTpl({ pageid, path, schema });
-        let pageOption = this.getBuildOption({ page, schema });
+        let pageOption = this.getBuildOption({ page, schema, lang });
         let content = await this.tplService.render(page.name, data, pageOption);
         return content;
     }
@@ -161,20 +162,21 @@ class SchemaService extends ksdp.integration.Dip {
      * @param {Object} [payload.account] 
      * @param {Object} [payload.query] 
      * @param {Object} [payload.dataSrv] 
+     * @param {String} [payload.lang] 
      * @returns {Promise<String>} content
      */
     async select(payload) {
-        let { pageid = "home", schema = "home", flow, token, account, query, dataSrv } = payload || {};
+        let { pageid = "home", schema = "home", lang: idiom = "en", flow, token, account, query, dataSrv } = payload || {};
         pageid = pageid || this.template.default;
         await this.configService?.load({ schema }, this);
 
-        let idiom = account?.lang || payload?.query?.idiom || "en";
+        idiom = account?.lang || idiom || payload?.query?.idiom || "en";
         let page = this.searchTpl({ pageid, path: this.path.page, schema });
-        let route = { ...this.route, schema };
+        let route = { ...this.route, schema, lang: idiom };
 
         let [lang, cont, menu] = await Promise.all([
             this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, schema }), idiom }),
-            dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, schema, flow, token }),
+            dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, schema, lang: idiom, flow, token }),
             await this.menuService?.loadDir(this.path.root, {
                 onlyDir: true,
                 filter: (item) => {
@@ -190,7 +192,7 @@ class SchemaService extends ksdp.integration.Dip {
                     metadata.schema = item.name;
                     metadata.name = metadata.name || metadata.schema;
                     metadata.group = metadata.group || "community";
-                    metadata.url = utl.mix(this.route.home, { ...this.route, schema: item.name });
+                    metadata.url = utl.mix(this.route.home, { ...this.route, schema: item.name, lang: idiom });
                     delta < 11 && (metadata.badge = {
                         class: delta < 5 ? "new" : "hot",
                         title: delta < 5 ? "new" : "hot"
@@ -216,7 +218,7 @@ class SchemaService extends ksdp.integration.Dip {
             },
             ...cont
         }
-        let content = await this.getContent({ schema, pageid, flow, token, page, data });
+        let content = await this.getContent({ schema, lang: idiom, pageid, flow, token, page, data });
         return !page.isFragment ? content : this.renderLayout({ content, schema, account, menu, data });
     }
 
@@ -226,9 +228,9 @@ class SchemaService extends ksdp.integration.Dip {
      * @returns {Promise<String>}
      */
     renderLayout(payload = {}) {
-        const { data, content = "", menu, schema = "view", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
+        const { data, content = "", menu, schema = "view", lang = "en", scripts = "", styles = "", title = "Auth API DOC" } = payload || {};
         const page = this.searchTpl({ pageid: "layout", path: this.path.page, schema });
-        const pageOption = this.getBuildOption({ page, schema, force: true });
+        const pageOption = this.getBuildOption({ page, schema, force: true, lang });
         return this.tplService.render(
             page.name,
             {
@@ -248,10 +250,10 @@ class SchemaService extends ksdp.integration.Dip {
      * @param {Object} payload 
      * @returns {Object} options
      */
-    getBuildOption({ schema, page, force }) {
+    getBuildOption({ schema, lang = "en", page, force }) {
         let cache = null;
         if ((force === undefined || force === false) && this.path?.cache) {
-            const cachePath = _path.resolve(utl.mix(this.path.cache, { ...this.path, schema }));
+            const cachePath = _path.join(utl.mix(this.path.cache, { ...this.path, schema }), lang);
             cache = { cacheExt: "html", cacheType: "file", cachePath };
         }
         return { path: page.path, ext: page.ext, ...cache };

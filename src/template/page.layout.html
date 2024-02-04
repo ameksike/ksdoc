@@ -38,7 +38,13 @@
                 <a class="nav-link" href="{{url.home}}">{{lang.home}}</a>
                 <a class="nav-link" href="{{url.api}}">{{lang.api}}</a>
                 {% for item in menu %}
-                <a class="nav-link" href="{{item.url}}">{{item.title}}</a>
+                <a class="nav-link" href="{{item.url}}">
+                    {% if lang.menu[item.title] %}
+                        {{lang.menu[item.title]}}
+                    {% else %}
+                        {{item.title}}
+                    {% endif %}
+                </a>
                 {% endfor %}
             </nav>
             <!-- PAGE CONTENT -->

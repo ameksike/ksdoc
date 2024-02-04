@@ -46,6 +46,7 @@ class MenuService {
      * @description check the user session
      * @param {Object} payload 
      * @param {String} [payload.schema] 
+     * @param {String} [payload.lang] 
      * @param {Object} [payload.path] 
      * @param {Object} [payload.route] 
      * @param {Object} [payload.cfg] 
@@ -53,7 +54,7 @@ class MenuService {
      * @param {Object|String} [payload.source]
      * @returns {Promise<any>} config
      */
-    async load({ schema, path, route, cfg, source, action }) {
+    async load({ schema, lang, path, route, cfg, source, action }) {
         try {
             path = path || this.path;
             route = route || this.route;
@@ -65,7 +66,7 @@ class MenuService {
             return this.loadDir(source, {
                 render: action instanceof Function ? action : (item) => {
                     let title = item.name.replace(/\.html$/i, "");
-                    let url = utl.mix(item.url || this.route.pag, { ...this.route, schema, page: title });
+                    let url = utl.mix(item.url || this.route.pag, { ...this.route, schema, lang, page: title });
                     return { url, title };
                 }
             });

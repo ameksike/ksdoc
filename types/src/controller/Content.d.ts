@@ -114,6 +114,7 @@ declare class ContentController extends ContentController_base {
      * @param {Object} [req.body]
      * @param {Object} [req.params]
      * @param {String} [req.params.schema]
+     * @param {String} [req.params.lang]
      * @param {Object} res
      */
     logout(req: {
@@ -121,6 +122,7 @@ declare class ContentController extends ContentController_base {
         body?: any;
         params?: {
             schema?: string;
+            lang?: string;
         };
     }, res: any): Promise<void>;
 }

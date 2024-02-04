@@ -74,6 +74,7 @@ declare class ContentService extends ContentService_base {
      * @param {Object} [payload]
      * @param {String} [payload.pageid]
      * @param {String} [payload.schema]
+     * @param {String} [payload.lang]
      * @param {String} [payload.path]
      * @param {Object} [payload.page]
      * @param {Object} [payload.data]
@@ -84,6 +85,7 @@ declare class ContentService extends ContentService_base {
     getContent(payload?: {
         pageid?: string;
         schema?: string;
+        lang?: string;
         path?: string;
         page?: any;
         data?: any;
@@ -95,6 +97,7 @@ declare class ContentService extends ContentService_base {
      * @param {Object} [payload]
      * @param {String} [payload.pageid]
      * @param {String} [payload.schema]
+     * @param {String} [payload.lang]
      * @param {String} [payload.flow]
      * @param {String} [payload.idm]
      * @param {String} [payload.token]
@@ -107,6 +110,7 @@ declare class ContentService extends ContentService_base {
     select(payload?: {
         pageid?: string;
         schema?: string;
+        lang?: string;
         flow?: string;
         idm?: string;
         token?: string;
@@ -126,5 +130,5 @@ declare class ContentService extends ContentService_base {
      * @param {Object} payload
      * @returns {Object} options
      */
-    getBuildOption({ schema, page, force }: any): any;
+    getBuildOption({ schema, page, force, lang }: any): any;
 }
