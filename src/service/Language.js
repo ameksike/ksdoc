@@ -1,4 +1,6 @@
 const _path = require("path");
+const utl = require('../utl');
+
 class Language {
     /**
      * @type {String}
@@ -25,13 +27,8 @@ class Language {
      */
     load(option) {
         const { path, idiom = "en", extension } = option || {};
-        try {
-            const file = _path.join(path, (idiom || this.default) + "." + (extension || this.extension));
-            return Promise.resolve(file ? require(file) : {});
-        }
-        catch (_) {
-            return Promise.resolve({});
-        }
+        const file = _path.join(path, (idiom || this.default) + "." + (extension || this.extension));
+        return utl.fileRead(file);
     }
 }
 

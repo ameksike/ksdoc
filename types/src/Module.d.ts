@@ -95,10 +95,33 @@ declare class DocumentModule extends DocumentModule_base {
     getRoute(key: string, option: any): string;
     /**
      * @description configure the Document module
-     * @param {Object} option
+     * @param {Object|null} option
      * @returns {DocumentModule} self
      */
-    configure(option: any): DocumentModule;
+    configure(option?: any | null): DocumentModule;
+    /**
+     * @description schema reconfiguration
+     * @param {Object} [req]
+     * @param {Object} [req.ksdoc]
+     * @param {Object} [req.params]
+     * @param {String} [req.params.schema]
+     * @returns {Promise<DocumentModule>} self
+     */
+    load(req?: {
+        ksdoc?: any;
+        params?: {
+            schema?: string;
+        };
+    }): Promise<DocumentModule>;
+    /**
+     * @description controller delegation
+     * @param {Object} req
+     * @param {Object} res
+     * @param {Object} next
+     * @param {String} srv
+     * @param {String} act
+     */
+    delegate(req: any, res: any, next: any, srv: string, act: string): Promise<any>;
     /**
      * @description initialize the module
      * @param {Object} app

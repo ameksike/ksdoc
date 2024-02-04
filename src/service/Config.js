@@ -1,7 +1,6 @@
 const _path = require('path');
 const utl = require('../utl');
-const _fs = require('fs');
-const _fsp = _fs.promises;
+
 class ConfigService {
     /**
      * @type {String}
@@ -50,7 +49,7 @@ class ConfigService {
     /**
      * @description check the user session
      * @param {Object} payload 
-     * @param {String} [payload.scheme]
+     * @param {String} [payload.schema]
      * @param {String} [payload.filename]
      * @param {String} [payload.file]
      * @param {String} [payload.path]
@@ -58,12 +57,12 @@ class ConfigService {
      * @param {Object} [target]
      * @returns {Promise<any>} config
      */
-    async load({ scheme, file, filename, path, type }, target) {
+    async load({ schema, file, filename, path, type }, target) {
         try {
-            let paths = { ...this.path, scheme };
+            let paths = { ...this.path, schema };
             file = file || _path.join(utl.mix(path || this.path.core, paths), filename || this.filename);
-            let data = await this.readFile(file + (type || ".json"), type || "json");
-            data = data || await this.readFile(file);
+            let data = await utl.fileRead(file + (type || ".json"));
+            data = data || await utl.fileRead(file);
             if (target) {
                 // main options
                 data?.cfg && (target.cfg = { ...target.cfg, ...data.cfg });
@@ -84,23 +83,6 @@ class ConfigService {
         }
         catch (_) {
             return {};
-        }
-    }
-
-    /**
-     * @description read objects from file 
-     * @param {String} file 
-     * @param {String} [type]
-     * @param {String} [encoding] 
-     * @returns {Promise<Object>}
-     */
-    async readFile(file, type = "", encoding = "utf8") {
-        try {
-            let content = type === "json" ? await _fsp.readFile(file, encoding) : require(file);
-            return typeof content === "string" ? JSON.parse(content) : content;
-        }
-        catch (_) {
-            return null;
         }
     }
 }

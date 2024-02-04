@@ -82,7 +82,7 @@ declare class ContentController extends ContentController_base {
      * @param {String} [req.body.grant_type]
      * @param {Object} [req.query]
      * @param {String} [req.query.redirectUrl]
-     * @param {String} [req.query.scheme]
+     * @param {String} [req.query.schema]
      * @param {String} [req.query.mode]
      * @param {Object} [req.headers]
      * @param {Object} [req.params]
@@ -101,7 +101,7 @@ declare class ContentController extends ContentController_base {
         };
         query?: {
             redirectUrl?: string;
-            scheme?: string;
+            schema?: string;
             mode?: string;
         };
         headers?: any;
@@ -113,14 +113,14 @@ declare class ContentController extends ContentController_base {
      * @param {String} [req.flow]
      * @param {Object} [req.body]
      * @param {Object} [req.params]
-     * @param {String} [req.params.scheme]
+     * @param {String} [req.params.schema]
      * @param {Object} res
      */
     logout(req: {
         flow?: string;
         body?: any;
         params?: {
-            scheme?: string;
+            schema?: string;
         };
     }, res: any): Promise<void>;
 }

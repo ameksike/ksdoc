@@ -1,5 +1,11 @@
 <div class="content">
-    <p> {{description}} </p>
+    <p> 
+        {% if lang.description %}
+            {{lang.description}} 
+        {% else %}
+            {{description}} 
+        {% endif %}
+    </p>
 
     <ul>
         <li> <a href="/doc/view#{{version}}"><strong> {{lang.version}}: </strong> {{version}}</a> </li>

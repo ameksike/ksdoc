@@ -38,7 +38,14 @@ declare const _exports: {
     route: any;
     template: any;
     getRoute(key: string, option: any): string;
-    configure(option: any): Document;
+    configure(option?: any): Document;
+    load(req?: {
+        ksdoc?: any;
+        params?: {
+            schema?: string;
+        };
+    }): Promise<Document>;
+    delegate(req: any, res: any, next: any, srv: string, act: string): Promise<any>;
     init(app: any, publish?: Function, cfg?: any): {
         cls: {
             module: {
@@ -79,7 +86,14 @@ declare const _exports: {
         route: any;
         template: any;
         getRoute(key: string, option: any): string;
-        configure(option: any): Document;
+        configure(option?: any): Document;
+        load(req?: {
+            ksdoc?: any;
+            params?: {
+                schema?: string;
+            };
+        }): Promise<Document>;
+        delegate(req: any, res: any, next: any, srv: string, act: string): Promise<any>;
         init(app: any, publish?: Function, cfg?: any): any;
         setDependencies(options: any): any;
         inject(options: any): any;

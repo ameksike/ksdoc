@@ -62,20 +62,20 @@ declare class SchemaService extends SchemaService_base {
      * @description get the page metadata
      * @param {Object} payload
      * @param {String} [payload.pageid]
-     * @param {String} [payload.scheme]
+     * @param {String} [payload.schema]
      * @param {String} [payload.path]
      * @returns {Object} page metadata
      */
     searchTpl(payload: {
         pageid?: string;
-        scheme?: string;
+        schema?: string;
         path?: string;
     }): any;
     /**
      * @description get html content
      * @param {Object} [payload]
      * @param {String} [payload.pageid]
-     * @param {String} [payload.scheme]
+     * @param {String} [payload.schema]
      * @param {String} [payload.token]
      * @param {String} [payload.flow]
      * @param {String} [payload.path]
@@ -85,7 +85,7 @@ declare class SchemaService extends SchemaService_base {
      */
     getContent(payload?: {
         pageid?: string;
-        scheme?: string;
+        schema?: string;
         token?: string;
         flow?: string;
         path?: string;
@@ -96,7 +96,7 @@ declare class SchemaService extends SchemaService_base {
      * @description get content to render
      * @param {Object} [payload]
      * @param {String} [payload.pageid]
-     * @param {String} [payload.scheme]
+     * @param {String} [payload.schema]
      * @param {String} [payload.flow]
      * @param {String} [payload.idm]
      * @param {String} [payload.token]
@@ -107,7 +107,7 @@ declare class SchemaService extends SchemaService_base {
      */
     select(payload?: {
         pageid?: string;
-        scheme?: string;
+        schema?: string;
         flow?: string;
         idm?: string;
         token?: string;
@@ -126,5 +126,5 @@ declare class SchemaService extends SchemaService_base {
      * @param {Object} payload
      * @returns {Object} options
      */
-    getBuildOption({ scheme, page, force }: any): any;
+    getBuildOption({ schema, page, force }: any): any;
 }
