@@ -335,6 +335,7 @@ class DocumentModule extends ksdp.integration.Dip {
                     schema,
                     token,
                     flow: req.flow,
+                    lang,
                     path: path.resolve(utl.mix(this.path?.api, { ...this.path, schema, lang }))
                 };
                 const action = await this.apiController?.init(this.cfg, option, req.ksdoc);
