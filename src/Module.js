@@ -128,28 +128,28 @@ class DocumentModule extends ksdp.integration.Dip {
             lib: __dirname,
             root: path.join(__dirname, '../../../docs'),
             // partials
-            api: '{root}/{scheme}/api',
-            page: '{root}/{scheme}/page',
-            lang: '{root}/{scheme}/lang',
-            config: '{root}/{scheme}/config',
-            resource: '{root}/{scheme}/resource',
-            core: '{root}/{scheme}/core',
+            api: '{root}/{schema}/api',
+            page: '{root}/{schema}/page',
+            lang: '{root}/{schema}/lang',
+            config: '{root}/{schema}/config',
+            resource: '{root}/{schema}/resource',
+            core: '{root}/{schema}/core',
             cache: '{core}/cache',
         };
         this.route = {
             root: '/doc',
             resource: '/resource',
             // security
-            login: '{root}/{scheme}/sec/login',
-            logout: '{root}/{scheme}/sec/logout',
-            access: '{root}/{scheme}/sec/access',
-            unauthorized: '{root}/{scheme}/sec/access',
+            login: '{root}/{schema}/sec/login',
+            logout: '{root}/{schema}/sec/logout',
+            access: '{root}/{schema}/sec/access',
+            unauthorized: '{root}/{schema}/sec/access',
             // partials
-            public: '{resource}/{scheme}',
-            home: '{root}/{scheme}',
-            pag: '{root}/{scheme}/{page}',
-            api: '{root}/{scheme}/api',
-            src: '{root}/{scheme}/src',
+            public: '{resource}/{schema}',
+            home: '{root}/{schema}',
+            pag: '{root}/{schema}/{page}',
+            api: '{root}/{schema}/api',
+            src: '{root}/{schema}/src',
         };
         this.template = {
             default: 'main',
@@ -196,73 +196,99 @@ class DocumentModule extends ksdp.integration.Dip {
 
     /**
      * @description configure the Document module 
-     * @param {Object} option 
+     * @param {Object|null} option 
      * @returns {DocumentModule} self
      */
-    configure(option) {
-        if (typeof option === "object") {
-            // controllers 
-            option.schemaController && (this.schemaController = option.schemaController);
-            option.contentController && (this.contentController = option.contentController);
-            option.apiController && (this.apiController = option.apiController);
-            // services 
-            option.tplService && (this.tplService = option.tplService);
-            option.contentService && (this.contentService = option.contentService);
-            option.sessionService && (this.sessionService = option.sessionService);
-            option.authService && (this.authService = option.authService);
-            option.dataService && (this.dataService = option.dataService);
-            // utils 
-            option.logger && (this.logger = option.logger);
-            // options 
-            option.cfg instanceof Object && Object.assign(this.cfg, option.cfg);
-            option.path instanceof Object && Object.assign(this.path, option.path);
-            option.route instanceof Object && Object.assign(this.route, option.route);
-            option.template instanceof Object && Object.assign(this.template, option.template);
-        }
+    configure(option = null) {
+        option = option || {};
+        // controllers 
+        !option.schemaController && (option.schemaController = this.schemaController);
+        !option.contentController && (option.contentController = this.contentController);
+        !option.apiController && (option.apiController = this.apiController);
+        // services 
+        !option.schemaService && (option.schemaService = this.schemaService);
+        !option.contentService && (option.contentService = this.contentService);
+        !option.languageService && (option.languageService = this.languageService);
+        !option.sessionService && (option.sessionService = this.sessionService);
+        !option.configService && (option.configService = this.configService);
+        !option.authService && (option.authService = this.authService);
+        !option.dataService && (option.dataService = this.dataService);
+        !option.menuService && (option.menuService = this.menuService);
+        // utils 
+        !option.logger && (option.logger = this.logger);
+        !option.tplService && (option.tplService = this.tplService);
+        // options 
+        option.cfg = { ...this.cfg, ...option.cfg };
+        option.path = { ...this.path, ...option.path };
+        option.route = { ...this.route, ...option.route };
+        option.template = { ...this.template, ...option.template };
+        // configure
         this.configService?.configure({
-            path: this.path,
-            logger: this.logger || null,
+            path: option.path,
+            logger: option.logger || null,
             filename: option?.filename
         });
         this.menuService?.configure({
-            logger: this.logger || null,
-            path: this.path,
-            route: this.route,
-            cfg: this.cfg
+            logger: option.logger || null,
+            path: option.path,
+            route: option.route,
+            cfg: option.cfg
         });
         const diService = {
-            languageService: this.languageService || null,
-            configService: this.configService || null,
-            menuService: this.menuService || null,
-            dataService: this.dataService || null,
-            tplService: this.tplService || null,
-            template: this.template,
-            logger: this.logger || null,
-            route: this.route,
-            path: this.path,
-            cfg: this.cfg
-        };
-        const diController = {
-            sessionService: this.sessionService || null,
-            contentService: this.contentService || null,
-            schemaService: this.schemaService || null,
-            configService: this.configService || null,
-            authService: this.authService || null,
-            dataService: this.dataService || null,
-            logger: this.logger || null,
-            route: this.route,
-            path: this.path,
-            cfg: this.cfg
+            languageService: option.languageService || null,
+            configService: option.configService || null,
+            menuService: option.menuService || null,
+            dataService: option.dataService || null,
+            tplService: option.tplService || null,
+            template: option.template,
+            logger: option.logger || null,
+            route: option.route,
+            path: option.path,
+            cfg: option.cfg
         };
         this.sessionService?.inject({
-            authService: this.authService || null
+            authService: option.authService || null
         });
         this.contentService?.inject(diService);
         this.schemaService?.inject(diService);
-        this.schemaController?.inject(diController);
-        this.contentController?.inject(diController);
-        this.apiController?.inject(diController)
+        this.schemaController?.inject(option);
+        this.contentController?.inject(option);
+        this.apiController?.inject(option)
         return this;
+    }
+
+    /**
+     * @description schema reconfiguration
+     * @param {Object} [req] 
+     * @param {Object} [req.ksdoc] 
+     * @param {Object} [req.params] 
+     * @param {String} [req.params.schema] 
+     * @returns {Promise<DocumentModule>} self
+     */
+    async load(req) {
+        let option = req?.ksdoc;
+        if (typeof req?.params?.schema === "string" && req?.params?.schema) {
+            option = await this.configService?.load(req?.params, this.contentService);
+            req.ksdoc = option;
+        }
+        return this.configure(option);
+    }
+
+    /**
+     * @description controller delegation 
+     * @param {Object} req 
+     * @param {Object} res 
+     * @param {Object} next 
+     * @param {String} srv 
+     * @param {String} act 
+     */
+    async delegate(req, res, next, srv, act) {
+        await this.load(req);
+        let self = this;
+        if (srv && act && typeof self[srv] === "object" && self[srv][act] instanceof Function) {
+            return self[srv][act](req, res, next);
+        }
+        return next();
     }
 
     /**
@@ -276,49 +302,50 @@ class DocumentModule extends ksdp.integration.Dip {
         if (typeof app?.use !== "function" || typeof app?.post !== "function") {
             return this;
         }
-        const routed = { ...this.route, scheme: ":scheme" };
-        const mwCheck = (req, res, next) => this.contentController.check(req, res, next);
+        const routed = { ...this.route, schema: ":schema" };
+        const mwCheck = (req, res, next) => this.delegate(req, res, next, "contentController", "check");
         const mwFormData = formDataMw?.support();
         // Resources URL
         publish instanceof Function && app.use("/ksdoc", publish(path.join(__dirname, "webcomponet")));
         publish instanceof Function && app.use(utl.mix(this.route.public, routed), (req, res, next) => {
-            const scheme = req.params.scheme;
-            const resouce = path.resolve(utl.mix(this.path.resource, { ...this.path, scheme }));
+            const schema = req.params.schema;
+            const resouce = path.resolve(utl.mix(this.path.resource, { ...this.path, schema }));
             publish(resouce)(req, res, next);
         });
         // Security URL
-        app.post(utl.mix(this.route.login, routed), (req, res) => this.contentController.login(req, res));
-        app.get(utl.mix(this.route.logout, routed), (req, res) => this.contentController.logout(req, res));
-        app.get(utl.mix(this.route.access, routed), (req, res) => this.contentController.access(req, res));
+        app.post(utl.mix(this.route.login, routed), (req, res, next) => this.delegate(req, res, next, "contentController", "login"));
+        app.get(utl.mix(this.route.logout, routed), (req, res, next) => this.delegate(req, res, next, "contentController", "logout"));
+        app.get(utl.mix(this.route.access, routed), (req, res, next) => this.delegate(req, res, next, "contentController", "access"));
         // Content API URL
         this.route?.api && this.apiController?.configure({ cfg: this.cfg, path: this.path }) && app.use(
             utl.mix(this.route.api, routed),
             mwCheck,
             this.apiController.middlewares(),
             async (req, res, next) => {
-                const scheme = req.params.scheme;
+                await this.load(req);
+                const schema = req.params.schema;
                 const token = this.sessionService?.getToken(req);
                 const account = this.sessionService?.account(req, this.cfg?.session?.key);
                 const option = {
-                    flow: req.flow,
                     ...req.query,
-                    token,
                     account,
-                    scheme,
-                    path: path.resolve(utl.mix(this.path.api, { ...this.path, scheme }))
+                    schema,
+                    token,
+                    flow: req.flow,
+                    path: path.resolve(utl.mix(this.path?.api, { ...this.path, schema }))
                 };
-                const action = await this.configure().apiController.init(this.cfg, option);
+                const action = await this.apiController?.init(this.cfg, option, req.ksdoc);
                 action instanceof Function && action(req, res, next);
             }
         );
         // Content URL 
-        app.get(this.route.root + "/:scheme/:id", mwCheck, (req, res) => this.configure().contentController.show(req, res));
-        app.delete(this.route.root + "/:scheme/:id", mwCheck, (req, res) => this.configure().contentController.delete(req, res));
-        app.post(this.route.root + "/:scheme/:id", mwCheck, mwFormData, (req, res) => this.configure().contentController.save(req, res));
-        app.put(this.route.root + "/:scheme/:id", mwCheck, mwFormData, (req, res) => this.configure().contentController.save(req, res));
-        app.get(this.route.root + "/:scheme", mwCheck, (req, res) => this.configure().contentController.show(req, res));
-        // Scheme URL 
-        app.get(this.route.root, (req, res) => this.configure().schemaController.show(req, res));
+        app.get(this.route.root + "/:schema/:id", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "show"));
+        app.delete(this.route.root + "/:schema/:id", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "delete"));
+        app.post(this.route.root + "/:schema/:id", mwCheck, mwFormData, (req, res, next) => this.delegate(req, res, next, "contentController", "save"));
+        app.put(this.route.root + "/:schema/:id", mwCheck, mwFormData, (req, res, next) => this.delegate(req, res, next, "contentController", "save"));
+        app.get(this.route.root + "/:schema", mwCheck, (req, res, next) => this.delegate(req, res, next, "contentController", "show"));
+        // schema URL 
+        app.get(this.route.root, (req, res, next) => this.delegate(req, res, next, "schemaController", "show"));
     }
 }
 

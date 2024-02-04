@@ -45,7 +45,7 @@ class MenuService {
     /**
      * @description check the user session
      * @param {Object} payload 
-     * @param {String} [payload.scheme] 
+     * @param {String} [payload.schema] 
      * @param {Object} [payload.path] 
      * @param {Object} [payload.route] 
      * @param {Object} [payload.cfg] 
@@ -53,19 +53,19 @@ class MenuService {
      * @param {Object|String} [payload.source]
      * @returns {Promise<any>} config
      */
-    async load({ scheme, path, route, cfg, source, action }) {
+    async load({ schema, path, route, cfg, source, action }) {
         try {
             path = path || this.path;
             route = route || this.route;
             cfg = cfg || this.cfg;
             source = source || cfg?.menu || path.page;
             if (typeof source === "string") {
-                source = _path.resolve(utl.mix(source, { ...path, scheme }));
+                source = _path.resolve(utl.mix(source, { ...path, schema }));
             }
             return this.loadDir(source, {
                 render: action instanceof Function ? action : (item) => {
                     let title = item.name.replace(/\.html$/i, "");
-                    let url = utl.mix(item.url || this.route.pag, { ...this.route, scheme, page: title });
+                    let url = utl.mix(item.url || this.route.pag, { ...this.route, schema, page: title });
                     return { url, title };
                 }
             });

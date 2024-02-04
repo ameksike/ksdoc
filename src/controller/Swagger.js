@@ -67,51 +67,52 @@ class SwaggerController extends ksdp.integration.Dip {
      * @param {Object} [cfg] 
      * @param {Object} [option] 
      * @param {String} [option.path] 
-     * @param {String} [option.scheme]
+     * @param {String} [option.schema]
      * @param {String} [option.flow] 
+     * @param {Object} [option]
      * @returns {Promise<any[]>} midllewares
      */
-    async init(cfg = null, option = null) {
-        const config = this.loadConfig(option);
-        cfg = { ...cfg, ...this.cfg, ...config };
-        const metadata = await this.dataService?.load({ ...option, name: "desc" }) || {};
-        cfg.swaggerDefinition.tags = this.loadTags(cfg?.topics, metadata);
-        cfg.swaggerDefinition.info.version = metadata?.version || cfg?.swaggerDefinition?.info?.version;
-        cfg.swaggerDefinition.info.description = await this.loadDescription({
+    async init(cfg = null, option = null, scope = null) {
+        const config = await this.loadConfig(option);
+        const cfgApi = { ...cfg, ...config };
+        const metadata = await this.dataService?.load({ ...cfgApi, ...option, name: "desc" }) || {};
+        cfgApi.swaggerDefinition.tags = this.loadTags(metadata, cfgApi);
+        cfgApi.swaggerDefinition.info.version = metadata?.version || cfgApi?.swaggerDefinition?.info?.version;
+        cfgApi.swaggerDefinition.info.description = await this.loadDescription({
             ...option,
             pageid: "desc",
             dataSrv: {
-                ...metadata,
-                description: cfg.swaggerDefinition.info.description,
-                version: cfg.swaggerDefinition.info.version,
+                version: cfgApi?.swaggerDefinition?.info?.version || scope?.metadata?.version,
+                description: cfgApi?.swaggerDefinition?.info?.description || scope?.metadata?.description,
+                ...metadata
             }
         });
-        //Array.isArray(cfg.apis) && (cfg.apis = cfg.apis.map(item => utl.mix(item, { api: this.path.root })));
-        const swaggerSpec = swaggerJSDoc(cfg);
+        const swaggerSpec = swaggerJSDoc(cfgApi);
         const delegate = swaggerUi.setup(swaggerSpec, {
             explorer: false,
-            customCssUrl: cfg.css,
-            customJs: cfg.js
+            customCssUrl: cfgApi.css,
+            customJs: cfgApi.js
         });
         return delegate;
     }
 
     /**
-     * @description 
-     * @param {*} topics 
-     * @param {*} metadata 
+     * @description get the topic or tag list 
+     * @param {Object} [metadata] 
+     * @param {Object} [cfg] 
      * @returns {Array<any>}
      */
-    loadTags(topics, metadata) {
-        return [];
+    loadTags(metadata, cfg = null) {
+        return metadata?.tags || metadata?.swaggerDefinition?.tags || cfg?.swaggerDefinition?.tags || [];
     }
 
     /**
      * @description load description
-     * @param {Object} metadata 
+     * @param {Object} [metadata] 
+     * @param {Object} [cfg] 
      * @returns {Promise<string>} description
      */
-    async loadDescription(metadata = {}) {
+    async loadDescription(metadata = {}, cfg = null) {
         const des = await this.contentService?.select(metadata);
         return des ? des.replace(/[\r\n]/gi, " ") : metadata?.dataSrv?.description;
     }
@@ -123,12 +124,12 @@ class SwaggerController extends ksdp.integration.Dip {
      * @param {String} [payload.path]
      * @param {String} [payload.file]
      * @param {String} [payload.filename]
-     * @returns {Object} config
+     * @returns {Promise<any>} config
      */
-    loadConfig({ path, flow, file, filename = "config.json" }) {
+    async loadConfig({ path, flow, file, filename = "config.json" }) {
         try {
             file = file || _path.join(path, filename);
-            const config = require(file);
+            const config = await utl.fileRead(file);
             Array.isArray(config?.apis) && (config.apis = config.apis.map(item => _path.resolve(utl.mix(item, { root: path }))));
             return config;
         }

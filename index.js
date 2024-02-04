@@ -1,5 +1,4 @@
 const Document = require('./src/Module');
-
 module.exports = new (class extends Document {
     cls = {
         module: {

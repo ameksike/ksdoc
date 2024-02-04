@@ -34,7 +34,7 @@ declare class MenuService {
     /**
      * @description check the user session
      * @param {Object} payload
-     * @param {String} [payload.scheme]
+     * @param {String} [payload.schema]
      * @param {Object} [payload.path]
      * @param {Object} [payload.route]
      * @param {Object} [payload.cfg]
@@ -42,8 +42,8 @@ declare class MenuService {
      * @param {Object|String} [payload.source]
      * @returns {Promise<any>} config
      */
-    load({ scheme, path, route, cfg, source, action }: {
-        scheme?: string;
+    load({ schema, path, route, cfg, source, action }: {
+        schema?: string;
         path?: any;
         route?: any;
         cfg?: any;

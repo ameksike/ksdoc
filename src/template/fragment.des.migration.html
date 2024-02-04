@@ -1,0 +1,21 @@
+<div>
+    {{snippets}}
+    <p>
+        {% if lang.description %}
+            {{lang.description}}
+        {% else %}
+            {{description}}
+        {% endif %}
+    </p>
+    <ul>
+        <li> <a href="/doc/view#{{version}}"><strong> {{lang.version}}: </strong> {{version}}</a> </li>
+        <li> <strong> {{lang.environment}}: </strong> {{environment}}</li>
+        <li> <a href="{{url.page}}/Builds#build_number"><strong> {{lang.build_number}}: </strong> {{build}} <span
+                    class=" hide {{flagBuild}}">{{lang.warning}}</span></a></li>
+        <li> <a href="{{url.page}}/Builds#migration_number"><strong> {{lang.migration_number}}: </strong> {{mActive}} <span
+                    class=" hide {{flagMigCur}}">{{lang.warning}}</span> </a> ({{lang.current}}) </li>
+        <li> <a href="{{url.page}}/Builds#migration_build"><strong> {{lang.migration_number}}: </strong> {{migration}}
+                <span class=" hide {{flagMigAva}}">{{lang.warning}}</span></a> ({{lang.last_available}}) </li>
+    </ul>
+    <p>{{lang.further_info}} <a href="{{url.home}}"><strong> {{lang.docref}}. </strong> </a></p>
+</div>

@@ -45,28 +45,30 @@ declare class SwaggerController extends SwaggerController_base {
      * @param {Object} [cfg]
      * @param {Object} [option]
      * @param {String} [option.path]
-     * @param {String} [option.scheme]
+     * @param {String} [option.schema]
      * @param {String} [option.flow]
+     * @param {Object} [option]
      * @returns {Promise<any[]>} midllewares
      */
     init(cfg?: any, option?: {
         path?: string;
-        scheme?: string;
+        schema?: string;
         flow?: string;
-    }): Promise<any[]>;
+    }, scope?: any): Promise<any[]>;
     /**
-     * @description
-     * @param {*} topics
-     * @param {*} metadata
+     * @description get the topic or tag list
+     * @param {Object} [metadata]
+     * @param {Object} [cfg]
      * @returns {Array<any>}
      */
-    loadTags(topics: any, metadata: any): Array<any>;
+    loadTags(metadata?: any, cfg?: any): Array<any>;
     /**
      * @description load description
-     * @param {Object} metadata
+     * @param {Object} [metadata]
+     * @param {Object} [cfg]
      * @returns {Promise<string>} description
      */
-    loadDescription(metadata?: any): Promise<string>;
+    loadDescription(metadata?: any, cfg?: any): Promise<string>;
     /**
      * @description load config
      * @param {Object} payload
@@ -74,13 +76,13 @@ declare class SwaggerController extends SwaggerController_base {
      * @param {String} [payload.path]
      * @param {String} [payload.file]
      * @param {String} [payload.filename]
-     * @returns {Object} config
+     * @returns {Promise<any>} config
      */
     loadConfig({ path, flow, file, filename }: {
         flow?: string;
         path?: string;
         file?: string;
         filename?: string;
-    }): any;
+    }): Promise<any>;
     middlewares(): any;
 }

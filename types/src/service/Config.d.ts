@@ -40,7 +40,7 @@ declare class ConfigService {
     /**
      * @description check the user session
      * @param {Object} payload
-     * @param {String} [payload.scheme]
+     * @param {String} [payload.schema]
      * @param {String} [payload.filename]
      * @param {String} [payload.file]
      * @param {String} [payload.path]
@@ -48,19 +48,11 @@ declare class ConfigService {
      * @param {Object} [target]
      * @returns {Promise<any>} config
      */
-    load({ scheme, file, filename, path, type }: {
-        scheme?: string;
+    load({ schema, file, filename, path, type }: {
+        schema?: string;
         filename?: string;
         file?: string;
         path?: string;
         type?: string;
     }, target?: any): Promise<any>;
-    /**
-     * @description read objects from file
-     * @param {String} file
-     * @param {String} [type]
-     * @param {String} [encoding]
-     * @returns {Promise<Object>}
-     */
-    readFile(file: string, type?: string, encoding?: string): Promise<any>;
 }

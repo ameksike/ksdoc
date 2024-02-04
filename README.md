@@ -33,11 +33,12 @@ const ksdocs = require("ksdocs");
 
 const app = express();
 
-ksdocs.configure({
+ksdocs.inject({
     path: {
-        root: __dirname + "/docs"
-    }
-}).init(app, express.static)
+      ...ksdocs.path,
+      root: __dirname + "/docs"
+    },
+}).init(app, express.static);
 
 app.listen(5555);
 ```
@@ -60,23 +61,23 @@ Through the configuration file it is possible to redefine all the behavior of th
 
 ### Optional Config file in JSON format
 
-File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.json ```
+File: ```<PATH_DOC>/<SCHEMA_NAME>/_/config.json ```
 ```Json
 {
   "cfg": {
     "scope": "public",
     "menu": [
-      { "name": "Introduction", "url": "{root}/{scheme}/{page}" },
+      { "name": "Introduction", "url": "{root}/{schema}/{page}" },
       { "name": "Onboarding" }
     ]
   },
   "path": {
-    "api": "{root}/{scheme}/api",
-    "page": "{root}/{scheme}/page",
-    "lang": "{root}/{scheme}/lang",
-    "config": "{root}/{scheme}/config",
-    "resource": "{root}/{scheme}/resource",
-    "core": "{root}/{scheme}/_",
+    "api": "{root}/{schema}/api",
+    "page": "{root}/{schema}/page",
+    "lang": "{root}/{schema}/lang",
+    "config": "{root}/{schema}/config",
+    "resource": "{root}/{schema}/resource",
+    "core": "{root}/{schema}/_",
     "cache": "{core}/cache"
   },
   "route": {
@@ -85,11 +86,11 @@ File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.json ```
     "logout": "{root}/auth/logout",
     "access": "{root}/auth/access",
     "unauthorized": "{root}/auth/access",
-    "public": "{resource}/{scheme}",
-    "home": "{root}/{scheme}",
-    "pag": "{root}/{scheme}/{page}",
-    "api": "{root}/{scheme}/api",
-    "src": "{root}/{scheme}/src"
+    "public": "{resource}/{schema}",
+    "home": "{root}/{schema}",
+    "pag": "{root}/{schema}/{page}",
+    "api": "{root}/{schema}/api",
+    "src": "{root}/{schema}/src"
   },
   "template": {
 	  "layout": "{lib}/template/page.layout.html"
@@ -101,19 +102,19 @@ File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.json ```
 
 ### Optional Config file in JavaScript format:
 
-File: ```<PATH_DOC>/<SCHEME_NAME>/_/config.js ```
+File: ```<PATH_DOC>/<SCHEMA_NAME>/_/config.js ```
 ```Js
 module.exports = {
   "cfg": {
     "scope": "public"
   },
   "path": {
-    "api": "{root}/{scheme}/api",
-    "page": "{root}/{scheme}/page",
-    "lang": "{root}/{scheme}/lang",
-    "config": "{root}/{scheme}/config",
-    "resource": "{root}/{scheme}/resource",
-    "core": "{root}/{scheme}/_",
+    "api": "{root}/{schema}/api",
+    "page": "{root}/{schema}/page",
+    "lang": "{root}/{schema}/lang",
+    "config": "{root}/{schema}/config",
+    "resource": "{root}/{schema}/resource",
+    "core": "{root}/{schema}/_",
     "cache": "{core}/cache"
   },
   "route": {
@@ -122,11 +123,11 @@ module.exports = {
     "logout": "{root}/auth/logout",
     "access": "{root}/auth/access",
     "unauthorized": "{root}/auth/access",
-    "public": "{resource}/{scheme}",
-    "home": "{root}/{scheme}",
-    "pag": "{root}/{scheme}/{page}",
-    "api": "{root}/{scheme}/api",
-    "src": "{root}/{scheme}/src"
+    "public": "{resource}/{schema}",
+    "home": "{root}/{schema}",
+    "pag": "{root}/{schema}/{page}",
+    "api": "{root}/{schema}/api",
+    "src": "{root}/{schema}/src"
   },
   "template": {
 	 "layout": "{core}/template/page.layout.html"

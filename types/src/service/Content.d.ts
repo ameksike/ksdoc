@@ -58,10 +58,10 @@ declare class ContentService extends ContentService_base {
     template: any | null;
     delete(payload: any): Promise<any>;
     save(payload: any): Promise<any>;
-    searchTpl({ pageid, path, scheme }: {
+    searchTpl({ pageid, path, schema }: {
         pageid: any;
         path: any;
-        scheme: any;
+        schema: any;
     }): {
         exist: boolean;
         isFragment: boolean;
@@ -73,7 +73,7 @@ declare class ContentService extends ContentService_base {
      * @description get html content
      * @param {Object} [payload]
      * @param {String} [payload.pageid]
-     * @param {String} [payload.scheme]
+     * @param {String} [payload.schema]
      * @param {String} [payload.path]
      * @param {Object} [payload.page]
      * @param {Object} [payload.data]
@@ -83,7 +83,7 @@ declare class ContentService extends ContentService_base {
      */
     getContent(payload?: {
         pageid?: string;
-        scheme?: string;
+        schema?: string;
         path?: string;
         page?: any;
         data?: any;
@@ -94,7 +94,7 @@ declare class ContentService extends ContentService_base {
      * @description get content to render
      * @param {Object} [payload]
      * @param {String} [payload.pageid]
-     * @param {String} [payload.scheme]
+     * @param {String} [payload.schema]
      * @param {String} [payload.flow]
      * @param {String} [payload.idm]
      * @param {String} [payload.token]
@@ -106,7 +106,7 @@ declare class ContentService extends ContentService_base {
      */
     select(payload?: {
         pageid?: string;
-        scheme?: string;
+        schema?: string;
         flow?: string;
         idm?: string;
         token?: string;
@@ -126,5 +126,5 @@ declare class ContentService extends ContentService_base {
      * @param {Object} payload
      * @returns {Object} options
      */
-    getBuildOption({ scheme, page, force }: any): any;
+    getBuildOption({ schema, page, force }: any): any;
 }
