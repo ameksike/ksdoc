@@ -74,6 +74,9 @@ class SwaggerController extends ksdp.integration.Dip {
      */
     async init(cfg = null, option = null, scope = null) {
         const config = await this.loadConfig(option);
+        if (!config) {
+            null;
+        }
         const cfgApi = { ...cfg, ...config };
         const metadata = await this.dataService?.load({ ...cfgApi, ...option, name: "desc" }) || {};
         cfgApi.swaggerDefinition.tags = this.loadTags(metadata, cfgApi);
@@ -124,18 +127,22 @@ class SwaggerController extends ksdp.integration.Dip {
      * @param {String} [payload.path]
      * @param {String} [payload.file]
      * @param {String} [payload.filename]
+     * @param {String} [payload.schema]
      * @returns {Promise<any>} config
      */
-    async loadConfig({ path, flow, file, filename = "config.json" }) {
+    async loadConfig({ path, flow, file, filename = "config.json", schema }) {
         try {
-            file = file || _path.join(path, filename);
+            file = file || (schema === "ksdoc"
+                ? _path.join(__dirname, "../../doc/api", filename)
+                : _path.join(path, filename));
+            path = schema === "ksdoc" ? _path.dirname(file) : path;
             const config = await utl.fileRead(file);
             Array.isArray(config?.apis) && (config.apis = config.apis.map(item => _path.resolve(utl.mix(item, { root: path }))));
             return config;
         }
         catch (_) {
             this.logger?.error({ flow, src: "KsDoc:API:config:load", error: { message: _?.message } });
-            return {};
+            return null;
         }
     }
 

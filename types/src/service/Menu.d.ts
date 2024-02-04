@@ -59,11 +59,13 @@ declare class MenuService {
      * @param {Function|null} [option.render]
      * @param {Function|null} [option.filter]
      * @param {Boolean|null} [option.onlyDir]
+     * @param {Array<any>} [option.extra]
      * @returns {Promise<Array<any>>}
      */
-    loadDir(source: Array<any> | string, { render, onlyDir, filter }: {
+    loadDir(source: Array<any> | string, { render, onlyDir, filter, extra }: {
         render?: Function | null;
         filter?: Function | null;
         onlyDir?: boolean | null;
+        extra?: Array<any>;
     }): Promise<Array<any>>;
 }

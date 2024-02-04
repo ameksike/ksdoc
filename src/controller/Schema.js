@@ -63,13 +63,14 @@ class SchemaController extends ksdp.integration.Dip {
      */
     async show(req, res) {
         let lang = req.params.lang;
+        let schema = "ksdoc";
         if (this.cfg?.schema?.default) {
-            let redirectURl = uts.mix(this.route.home, { ...this.route, schema: this.cfg.schema.default, lang });
+            let redirectURl = uts.mix(this.route.home, { ...this.route, schema, lang });
             return res.redirect(redirectURl);
         }
         let token = this.sessionService?.getToken(req);
         let account = this.sessionService?.account(req, this.cfg?.session?.key);
-        let layout = await this.schemaService?.select({ token, account, query: req.query, lang });
+        let layout = await this.schemaService?.select({ token, account, query: req.query, lang, schema });
         res.send(layout);
     }
 

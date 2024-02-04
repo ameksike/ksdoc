@@ -61,7 +61,9 @@ class MenuService {
             cfg = cfg || this.cfg;
             source = source || cfg?.menu || path.page;
             if (typeof source === "string") {
-                source = _path.resolve(utl.mix(source, { ...path, schema }));
+                source = schema === "ksdoc" 
+                ? _path.join(__dirname, "../../doc/page")
+                : _path.resolve(utl.mix(source, { ...path, schema }));
             }
             return this.loadDir(source, {
                 render: action instanceof Function ? action : (item) => {
@@ -83,13 +85,17 @@ class MenuService {
      * @param {Function|null} [option.render] 
      * @param {Function|null} [option.filter] 
      * @param {Boolean|null} [option.onlyDir] 
+     * @param {Array<any>} [option.extra] 
      * @returns {Promise<Array<any>>}
      */
-    async loadDir(source, { render = null, onlyDir = false, filter }) {
+    async loadDir(source, { render = null, onlyDir = false, filter, extra }) {
         let dir, files, result;
         try {
             dir = Array.isArray(source) ? source : await _fsp.readdir(source, { withFileTypes: true });
             files = onlyDir === null || onlyDir === undefined ? dir : dir.filter(item => !onlyDir === (item.isDirectory instanceof Function && !item.isDirectory() || !item.isDirectory));
+            if (extra && Array.isArray(extra)) {
+                files = [...extra, ...files];
+            }
             result = render instanceof Function ? files.map((item, i) => render(item, i, source)) : files;
             result = await Promise.all(result);
             result = filter instanceof Function ? result.filter(item => filter(item)) : result;

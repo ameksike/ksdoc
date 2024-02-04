@@ -107,13 +107,15 @@ class ContentService extends ksdp.integration.Dip {
     searchTpl({ pageid, path, schema }) {
         let route = { ...this.path, schema };
         let tpl = utl.mix(this.template[pageid], route);
-        let isFragment = !tpl || /snippet\..*/.test(tpl);
+        let isFragment = !tpl || /[snippet|README]\..*/i.test(tpl);
         let ext = !isFragment || !!tpl || /\.(md|twig|html|ejs|tpl)$/i.test(pageid) ? "" : "html";
         return {
             exist: !!tpl,
             isFragment,
             name: tpl ? _path.basename(tpl) : pageid,
-            path: tpl ? _path.dirname(tpl) : _path.resolve(utl.mix(path, route) || ""),
+            path: tpl ? _path.dirname(tpl) : (schema === "ksdoc" 
+                ? _path.join(__dirname, "../../doc/page") 
+                : _path.resolve(utl.mix(path, route))),
             ext
         };
     }

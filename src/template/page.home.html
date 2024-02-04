@@ -145,21 +145,20 @@
 
     <div class="banner">
         <div class="container">
-            <h1 class="main-title">Unlock Knowledge with Ksike Docs</h1>
-            <p class="lead-text">Explore insightful articles on various topics. Manage and read articles with ease. Stay
-                informed and inspired.</p>
+            <h1 class="main-title">{{lang.portal.title}}</h1>
+            <p class="lead-text">{{lang.portal.subtitle}}.</p>
         </div>
     </div>
 
     <div class="container">
 
         <div class="row search-section">
-            <form action="/doc" method="get">
+            <form action="{{url.base}}" method="get">
                 <div class="col-md-12">
                     <div class="input-group">
                         <input type="text" name="search" class="form-control search-input"
-                            placeholder="Search for articles...">
-                        <button class="btn btn-primary search-btn" type="submit">Search</button>
+                            placeholder="{{lang.portal.searchPlaceholder}}">
+                        <button class="btn btn-primary search-btn" type="submit">{{lang.portal.search}}</button>
                     </div>
                 </div>
             </form>
@@ -180,7 +179,7 @@
                         <p class="truncated-heigh">{{item.description}}</p>
                     </div>
                     <div class="mt-auto">
-                        <a href="{{item.url}}" class="btn btn-primary">Read More</a>
+                        <a href="{{item.url}}" class="btn btn-primary">{{lang.portal.btn.readmore}}</a>
                     </div>
                 </div>
             </div>
@@ -190,25 +189,24 @@
 
         <div class="row">
             <div class="col-md-12 advantage">
-                <h2>Why Choose Ksike Docs?</h2>
+                <h2>{{lang.portal.marketing.title}}</h2>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="advantage">
-                            <h3>Discover Insights</h3>
-                            <p>Explore articles that provide valuable insights and perspectives on diverse topics.</p>
+                            <h3>{{lang.portal.marketing.advantage1.title}}</h3>
+                            <p>{{lang.portal.marketing.advantage1.description}}</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="advantage">
-                            <h3>Stay Informed</h3>
-                            <p>Stay up-to-date with the latest information and trends in your area of interest.</p>
+                            <h3>{{lang.portal.marketing.advantage2.title}}</h3>
+                            <p>{{lang.portal.marketing.advantage2.description}}</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="advantage">
-                            <h3>User-Friendly</h3>
-                            <p>Our platform is designed with a focus on user experience, making article management and
-                                reading a breeze.</p>
+                            <h3>{{lang.portal.marketing.advantage3.title}}</h3>
+                            <p>{{lang.portal.marketing.advantage3.description}}</p>
                         </div>
                     </div>
                 </div>

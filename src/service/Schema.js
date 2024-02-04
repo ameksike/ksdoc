@@ -166,23 +166,21 @@ class SchemaService extends ksdp.integration.Dip {
      * @returns {Promise<String>} content
      */
     async select(payload) {
-        let { pageid = "home", schema = "home", lang: idiom = "en", flow, token, account, query, dataSrv } = payload || {};
+        let { pageid = "home", schema, lang: idiom = "en", flow, token, account, query, dataSrv } = payload || {};
         pageid = pageid || this.template.default;
         await this.configService?.load({ schema }, this);
 
-        idiom = account?.lang || idiom || payload?.query?.idiom || "en";
+        idiom = idiom || account?.lang || payload?.query?.idiom || "en";
         let page = this.searchTpl({ pageid, path: this.path.page, schema });
         let route = { ...this.route, schema, lang: idiom };
 
         let [lang, cont, menu] = await Promise.all([
-            this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, schema }), idiom }),
+            this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, schema }), idiom, schema }),
             dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, schema, lang: idiom, flow, token }),
             await this.menuService?.loadDir(this.path.root, {
                 onlyDir: true,
+                extra: [{ name: "ksdoc", isDirectory: true }],
                 filter: (item) => {
-                    if (item.name === "home") {
-                        return false;
-                    }
                     return !query?.search ? item : new RegExp(".*" + query?.search + ".*", "gi").test(item.name);
                 },
                 render: async (item) => {
@@ -211,6 +209,7 @@ class SchemaService extends ksdp.integration.Dip {
                 name: account?.user?.firstName || "Guest"
             },
             url: {
+                base: utl.mix(this.route.base, route),
                 public: utl.mix(this.route.public, route),
                 access: utl.mix(this.route.access, route),
                 logout: utl.mix(this.route.logout, route),
