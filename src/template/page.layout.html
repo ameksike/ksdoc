@@ -28,11 +28,15 @@
         </div>
 
         <div class="container-fluid justify-content-end">
-            <span class="navbar-brand">
-                {{lang.layout.welcome}}:
-                <a class="navbar-brand" href="{{url.home}}"> {{account.name}}</a>
-            </span>
-            <a class="btn btn-outline-success " href="{{url.logout}}">{{lang.btn.exit}}</a>
+            {% if account %}
+                <span class="navbar-brand">
+                    {{lang.layout.welcome}}:
+                    <a class="navbar-brand" href="{{url.home}}"> {{account.name}}</a>
+                </span>
+                <a class="btn btn-outline-success " href="{{url.logout}}">{{lang.btn.exit}}</a>
+            {% else %}
+                <a class="btn btn-outline-success " href="{{url.access}}">{{lang.btn.login}}</a>
+            {% endif %}
         </div>
     </nav>
 

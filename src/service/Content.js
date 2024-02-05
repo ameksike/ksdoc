@@ -113,8 +113,8 @@ class ContentService extends ksdp.integration.Dip {
             exist: !!tpl,
             isFragment,
             name: tpl ? _path.basename(tpl) : pageid,
-            path: tpl ? _path.dirname(tpl) : (schema === "ksdoc" 
-                ? _path.join(__dirname, "../../doc/page") 
+            path: tpl ? _path.dirname(tpl) : (schema === "ksdoc"
+                ? _path.join(__dirname, "../../doc/page")
                 : _path.resolve(utl.mix(path, route))),
             ext
         };
@@ -172,6 +172,7 @@ class ContentService extends ksdp.integration.Dip {
         ]);
 
         let data = {
+            global: config?.global,
             title: config?.metadata?.name,
             version: config?.metadata?.version,
             description: config?.metadata?.description,
@@ -179,9 +180,9 @@ class ContentService extends ksdp.integration.Dip {
             lang,
             token,
             ...query,
-            account: {
+            account: account?.user ? {
                 name: account?.user?.firstName || "Guest"
-            },
+            } : null,
             url: {
                 public: utl.mix(this.route.public, route),
                 access: utl.mix(this.route.access, route),

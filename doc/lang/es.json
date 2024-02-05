@@ -6,13 +6,13 @@
     "message": "El recurso al que intenta acceder ya no existe."
   },
   "access": {
-    "title": "Se requiere autenticación para acceder a la documentación.",
+    "title": "Se requiere autenticación para acceder a esta sección.",
     "subtitle": "Por favor ingrese su cuenta.",
 	"password": "Contraseña",
 	"username": "Nombre de usuario"
   },
   "btn": {
-    "login": "Acceso",
+    "login": "Entrar",
 	"exit": "Salir"
   },
   "msg": {

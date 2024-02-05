@@ -32,7 +32,14 @@
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <span class="badge bg-primary rounded-pill"> {{feature.type}} </span>
                     <div class="ms-2 me-auto">{{feature.title}}</div>
-                    <a href="https://jira.aircraft-sita.aero/browse/{{feature.task}}">
+                    <a href="
+                            {% if feature.url %}
+                                {{feature.url}} 
+                            {% elseif global.url.task %}
+                                {{global.url.task}}/{{feature.task}}
+                            {% else %}
+                                {{feature.task}}
+                            {% endif %}">
                         <span class="badge bg-primary rounded-pill">{{feature.task}} </span>
                     </a>
                 </li>

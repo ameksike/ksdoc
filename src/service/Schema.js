@@ -168,7 +168,7 @@ class SchemaService extends ksdp.integration.Dip {
     async select(payload) {
         let { pageid = "home", schema, lang: idiom = "en", flow, token, account, query, dataSrv } = payload || {};
         pageid = pageid || this.template.default;
-        await this.configService?.load({ schema }, this);
+        let config = await this.configService?.load({ schema }, this);
 
         idiom = idiom || account?.lang || payload?.query?.idiom || "en";
         let page = this.searchTpl({ pageid, path: this.path.page, schema });
@@ -205,13 +205,14 @@ class SchemaService extends ksdp.integration.Dip {
         ]);
 
         let data = {
+            global: config?.global,
             lang,
             token,
             ...query,
             menu,
-            account: {
+            account: account?.user ? {
                 name: account?.user?.firstName || "Guest"
-            },
+            } : null,
             url: {
                 base: utl.mix(this.route.base, route),
                 public: utl.mix(this.route.public, route),

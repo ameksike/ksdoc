@@ -90,6 +90,11 @@ FILE: ```core/config.json```
   "template": {
     "layout": "{lib}/template/page.layout.html",
     "desc": "{lib}/template/fragment.des.migration.html"
+  },
+  "global": {
+    "url": {
+        "task": "https://jira.com/browse"
+    }
   }
 }
 ```

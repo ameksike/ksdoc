@@ -6,7 +6,7 @@
     "message": "The resource you are trying to access no longer exists."
   },
   "access": {
-    "title": "Authentication is required to access the documentation.",
+    "title": "Authentication is required to access this section.",
     "subtitle": "Please enter your account.",
 	"password": "Password",
 	"username": "Username"
