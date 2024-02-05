@@ -168,7 +168,7 @@ class SchemaService extends ksdp.integration.Dip {
     async select(payload) {
         let { pageid = "home", schema, lang: idiom = "en", flow, token, account, query, dataSrv } = payload || {};
         pageid = pageid || this.template.default;
-        await this.configService?.load({ schema }, this);
+        let config = await this.configService?.load({ schema }, this);
 
         idiom = idiom || account?.lang || payload?.query?.idiom || "en";
         let page = this.searchTpl({ pageid, path: this.path.page, schema });
@@ -184,13 +184,17 @@ class SchemaService extends ksdp.integration.Dip {
                     return !query?.search ? item : new RegExp(".*" + query?.search + ".*", "gi").test(item.name);
                 },
                 render: async (item) => {
-                    let artConf = await this.configService?.load({ schema: item.name });
-                    let metadata = artConf?.metadata || { schema: item.name };
+                    let [artConf, language] = await Promise.all([
+                        this.configService?.load({ schema: item?.name }),
+                        this.languageService?.load({ paths: this.path, schema: item?.name, idiom })
+                    ])
+                    let metadata = artConf?.metadata || { schema: item?.name };
                     let delta = Math.abs(Date.now() - parseInt(metadata.date)) / (1000 * 60 * 60 * 24);
-                    metadata.schema = item.name;
-                    metadata.name = metadata.name || metadata.schema;
-                    metadata.group = metadata.group || "community";
-                    metadata.url = utl.mix(this.route.home, { ...this.route, schema: item.name, lang: idiom });
+                    metadata.schema = item?.name;
+                    metadata.url = utl.mix(this.route.home, { ...this.route, schema: item?.name, lang: idiom });
+                    metadata.name = language?.title || metadata.name || metadata.title || metadata.schema;
+                    metadata.description = language?.description || metadata.description;
+                    metadata.group = this.languageService?.at(metadata.group, language?.group) || metadata.group || "community";
                     delta < 11 && (metadata.badge = {
                         class: delta < 5 ? "new" : "hot",
                         title: delta < 5 ? "new" : "hot"
@@ -201,13 +205,14 @@ class SchemaService extends ksdp.integration.Dip {
         ]);
 
         let data = {
+            global: config?.global,
             lang,
             token,
             ...query,
             menu,
-            account: {
+            account: account?.user ? {
                 name: account?.user?.firstName || "Guest"
-            },
+            } : null,
             url: {
                 base: utl.mix(this.route.base, route),
                 public: utl.mix(this.route.public, route),

@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Explore insightful articles on various topics. Manage and read articles with ease. Stay informed and inspired.">
+    <meta name="description" content="
+        {% if lang.description %}
+            {{lang.description}}
+        {% else %}
+            {{description}}
+        {% endif %}">
     <title>KsDocs</title>
 
     <!-- Bootstrap CSS -->
