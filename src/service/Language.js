@@ -21,16 +21,37 @@ class Language {
      * @description load language content
      * @param {Object} [option]
      * @param {String} [option.path]
+     * @param {Object} [option.paths]
      * @param {String} [option.idiom]
      * @param {String} [option.schema]
      * @param {String} [option.extension]
+     * @param {String} [option.filename]
      * @returns {Promise<Object>}
      */
     load(option) {
-        const { path, idiom = "en", extension, schema } = option || {};
-        const filename = (idiom || this.default) + "." + (extension || this.extension);
-        const file = schema === "ksdoc" ? _path.join(__dirname, "../../doc/lang", filename) : _path.join(path, filename);
+        let { path, idiom = "en", extension, schema, filename, paths } = option || {};
+        path = path || utl.mix(paths?.lang, { ...paths, schema });
+        filename = filename || (idiom || this.default) + "." + (extension || this.extension);
+        let file = schema === "ksdoc" ? _path.join(__dirname, "../../doc/lang", filename) : _path.join(path, filename);
         return utl.fileRead(file);
+    }
+
+    /**
+     * @description safe language access
+     * @param {String} [key]
+     * @param {Object} [source] 
+     * @returns {String} value
+     */
+    at(key = null, source = null) {
+        try {
+            if (!source || key) {
+                return "";
+            }
+            return source[key];
+        }
+        catch (_) {
+            return "";
+        }
     }
 }
 

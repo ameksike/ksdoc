@@ -1,13 +1,39 @@
+# KsDoc Language options 
+
+```
+- MyDoc	
+|	+ page/
+|	|    - Introduction.html
+|	|    - Demos1.twig
+|	|    - Demos2.ejs
+|	|    - README.md
+|	+ core/
+|	|    - config.json
+|	|    + cache/
+|	|    |    + es/
+|	|    |    |    - Introduction.html
+|	|    |    + en/
+|	|    |    |    - Introduction.html
+|	+ templates/
+|	+ lang/
+|	|    - es.json
+|	|    - en.json
+```
+
+## Common language file
+FILE: ```lang/en.json```
+```json
 {
-  "title": "Ksike Docs Engine",
-  "description": "KsDoc is a versatile library within the Ksike ecosystem, designed to streamline and simplify the documentation process.",
+  "title": "My Articles",
+  "description": "This is a section of articles or tutorials, it also includes the documents of an API developed to learn.",
+
   "404": {
     "title": "Something was wrong.",
     "message": "The resource you are trying to access no longer exists."
   },
   "access": {
     "title": "Authentication is required to access the documentation.",
-    "subtitle": "Please enter your account.",
+    "subtitle": "Please enter your user account.",
 	"password": "Password",
 	"username": "Username"
   },
@@ -37,29 +63,6 @@
 	  "home": "Home",
 	  "api": "API Docs",
 	  "src": "SRC Docs"
-  }, 
-  "portal": {
-	"title": "Unlock Knowledge with Ksike Docs",
-	"subtitle": "Explore insightful articles on various topics. Manage and read articles with ease. Stay informed and inspired.",
-	"search": "Search",
-	"searchPlaceholder": "Search for articles...",
-	"marketing": {
-		"title": "Why Choose Ksike Docs?",
-		"advantage1": {
-		  "title": "Discover Insights",
-		  "description": "Explore articles that provide valuable insights and perspectives on diverse topics."
-		},
-		"advantage2": {
-		  "title": "Stay Informed",
-		  "description": "Stay up-to-date with the latest information and trends in your area of interest."
-		},
-		"advantage3": {
-		  "title": "User-Friendly",
-		  "description": "Our platform is designed with a focus on user experience, making article management and reading a breeze."
-		}
-	},
-	"btn": {
-		"readmore": "Read More"
-	}
   }
 }
+```

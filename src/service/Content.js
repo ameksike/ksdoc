@@ -107,7 +107,7 @@ class ContentService extends ksdp.integration.Dip {
     searchTpl({ pageid, path, schema }) {
         let route = { ...this.path, schema };
         let tpl = utl.mix(this.template[pageid], route);
-        let isFragment = !tpl || /[snippet|README]\..*/i.test(tpl);
+        let isFragment = !tpl || /(snippet|README)\..*/i.test(tpl);
         let ext = !isFragment || !!tpl || /\.(md|twig|html|ejs|tpl)$/i.test(pageid) ? "" : "html";
         return {
             exist: !!tpl,
@@ -167,7 +167,7 @@ class ContentService extends ksdp.integration.Dip {
         let page = this.searchTpl({ pageid, path: this.path.page, schema });
         let route = { ...this.route, schema, lang: idiom };
         let [lang, cont] = await Promise.all([
-            this.languageService?.load({ path: utl.mix(this.path.lang, { ...this.path, schema }), idiom }),
+            this.languageService?.load({ paths: this.path, schema, idiom }),
             dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, schema, flow, token })
         ]);
 
