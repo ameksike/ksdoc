@@ -301,6 +301,7 @@ class DocumentModule extends ksdp.integration.Dip {
      */
     init(app, publish = null, cfg = null) {
         this.cfg = cfg || this.cfg;
+        this.configure();
         if (typeof app?.use !== "function" || typeof app?.post !== "function") {
             return this;
         }
