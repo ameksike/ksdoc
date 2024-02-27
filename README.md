@@ -24,6 +24,24 @@ This library belong to the Ksike ecosystem:
 KsDoc stands out as a valuable addition to the Ksike ecosystem, offering developers an efficient and unified solution for documentation needs across diverse application types. With support for CLI, web, and API documentation, seamless integration with Swagger and JSDoc, and an emphasis on intuitive processes, KsDoc empowers developers to create well-documented and user-friendly applications.
 
 
+```Js
+class MyPlugin {
+	onInit();
+
+	onUpdate(req, res, next);
+	onDelete(req, res, next);
+	onSelect(req, res, next);
+	onCreate(req, res, next);
+	onShow(req, res, next);
+	
+	onFrontMenu();
+	onFrontContent();
+	
+	onAdminMenu();
+	onAdminContent();
+}
+```
+
 ## Quick overview
 
 - Server file:
