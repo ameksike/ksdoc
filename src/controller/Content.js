@@ -63,14 +63,14 @@ class ContentController extends ksdp.integration.Dip {
             let config = req.ksdoc;
             let token = this.sessionService?.getToken(req);
             let account = this.sessionService?.account(req, this.cfg?.session?.key);
-            let pageid = req.params.id || "";
+            let pageid = req.params.id || '';
             let layout = await this.contentService.select({ token, account, pageid, schema, lang, query: req.query, config });
             res.send(layout);
         }
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "KsDoc:check",
+                src: 'KsDoc:check',
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
@@ -107,14 +107,14 @@ class ContentController extends ksdp.integration.Dip {
                     return next();
                 } else {
                     this.sessionService?.create(req, this.cfg?.session?.key, { originalUrl: option.originalUrl });
-                    return res.redirect(uri.add(option.redirectUrl, { msg: "error_invalid_user", ...req.query }, req));
+                    return res.redirect(uri.add(option.redirectUrl, { msg: 'error_invalid_user', ...req.query }, req));
                 }
             }
         }
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "KsDoc:check",
+                src: 'KsDoc:check',
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
@@ -129,32 +129,32 @@ class ContentController extends ksdp.integration.Dip {
      */
     async save(req, res) {
         let params = utl.getFrom(req)
-        let { content, title = "default", index, type = this.keys.pages, id } = params;
+        let { content, schema, id, extension } = params;
         if (!content) {
             return res.status(400).send({
                 success: false,
-                msg: "E_BAD_REQUEST",
+                msg: 'E_BAD_REQUEST',
             });
         }
         try {
-            const filename = await this.contentService?.save({ path: this.path, id, index, title, type, content });
+            const filename = await this.contentService?.save({ path: this.path, content, schema, id, extension });
             this.logger?.info({
                 flow: req.flow,
-                src: "KsDoc:save",
+                src: 'KsDoc:save',
                 data: { filename }
             });
-            res.send({ success: true, msg: "SAVE_OK", data: { page: type + "/" + id } });
+            res.send({ success: true, msg: 'SAVE_OK', data: { page: schema + '/' + id } });
         }
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "KsDoc:save",
+                src: 'KsDoc:save',
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
             res.status(500).send({
                 success: false,
-                msg: "E_BAD_REQUEST",
+                msg: 'E_BAD_REQUEST',
             })
         }
     }
@@ -166,31 +166,31 @@ class ContentController extends ksdp.integration.Dip {
      */
     async delete(req, res) {
         try {
-            let { id, type = this.keys.pages } = utl.getFrom(req);
+            let { schema, id, extension } = utl.getFrom(req);
             if (!id) {
                 return res.status(400).send({
                     success: false,
-                    msg: "E_BAD_REQUEST",
+                    msg: 'E_BAD_REQUEST',
                 });
             }
-            let filename = await this.contentService?.delete({ id, type, exts: this.exts, path: this.path });
+            let filename = await this.contentService?.delete({ schema, id, extension, path: this.path });
             this.logger?.info({
                 flow: req.flow,
-                src: "KsDoc:delete",
+                src: 'KsDoc:delete',
                 data: { filename }
             });
-            res.send({ success: true, msg: "DELETE_OK", data: { page: type + "/" + id } });
+            res.send({ success: true, msg: 'DELETE_OK', data: { page: schema + '/' + id } });
         }
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "KsDoc:delete",
+                src: 'KsDoc:delete',
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
             res.status(500).send({
                 success: false,
-                msg: "E_BAD_REQUEST",
+                msg: 'E_BAD_REQUEST',
             })
         }
     }
@@ -207,20 +207,20 @@ class ContentController extends ksdp.integration.Dip {
             let config = req.ksdoc;
             let token = this.sessionService?.getToken(req);
             let account = this.sessionService?.account(req, this.cfg?.session?.key);
-            let layout = await this.contentService.select({ token, account, pageid: "login", schema, lang, query: req.query, config });
+            let layout = await this.contentService.select({ token, account, pageid: 'login', schema, lang, query: req.query, config });
             res.send(layout);
         }
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "KsDoc:access",
+                src: 'KsDoc:access',
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
             this.sessionService?.remove(req, this.cfg?.session?.key);
             res.status(500).send({
                 success: false,
-                msg: "E_BAD_REQUEST",
+                msg: 'E_BAD_REQUEST',
             });
         }
     }
@@ -249,8 +249,8 @@ class ContentController extends ksdp.integration.Dip {
         let schema = req.params.schema;
         let lang = req.params.lang;
         try {
-            if (req.body.grant_type !== "password") {
-                throw new Error("Incorrect Grant Type");
+            if (req.body.grant_type !== 'password') {
+                throw new Error('Incorrect Grant Type');
             }
             let mode = req.query.mode;
             let payload = await this.authService?.check({
@@ -259,22 +259,22 @@ class ContentController extends ksdp.integration.Dip {
                 username: req.body.username,
                 password: req.body.password,
                 scope: req.body.scope,
-                user_agent: req.body.user_agent || req.headers["user-agent"],
+                user_agent: req.body.user_agent || req.headers['user-agent'],
                 flow: req.flow
             });
             if (!payload) {
-                throw new Error("Authentication Failed");
+                throw new Error('Authentication Failed');
             }
             this.sessionService?.create(req, this.cfg?.session?.key, { access_token: payload.access_token, flow: req.flow, lang });
             let sess = this.sessionService?.account(req, this.cfg?.session?.key);
             let orgu = sess?.originalUrl || req.query.redirectUrl;
-            let rurl = orgu && orgu !== "/" ? orgu : uts.mix(this.route.home, { ...this.route, schema, lang });
+            let rurl = orgu && orgu !== '/' ? orgu : uts.mix(this.route.home, { ...this.route, schema, lang });
             this.logger?.info({
                 flow: req.flow,
-                src: "KsDoc:login",
+                src: 'KsDoc:login',
                 data: { rurl }
             });
-            if (mode === "in") {
+            if (mode === 'in') {
                 rurl = uri.add(rurl, { token: payload.access_token }, req);
             }
             res.redirect(rurl);
@@ -282,10 +282,10 @@ class ContentController extends ksdp.integration.Dip {
         catch (error) {
             this.sessionService?.remove(req, this.cfg?.session?.key);
             let urlr = uts.mix(this.route.unauthorized, { ...this.route, schema, lang });
-            urlr = uri.add(urlr, { msg: "Invalid user" }, req);
+            urlr = uri.add(urlr, { msg: 'Invalid user' }, req);
             this.logger?.error({
                 flow: req.flow,
-                src: "KsDoc:login",
+                src: 'KsDoc:login',
                 error: { message: error?.message || error, stack: error?.stack },
                 data: { ...req.body, redirect: urlr }
             });
@@ -314,13 +314,13 @@ class ContentController extends ksdp.integration.Dip {
         catch (error) {
             this.logger?.error({
                 flow: req.flow,
-                src: "KsDoc:logout",
+                src: 'KsDoc:logout',
                 error: { message: error?.message || error, stack: error?.stack },
                 data: req.body
             });
             res.status(500).send({
                 success: false,
-                msg: "E_BAD_REQUEST",
+                msg: 'E_BAD_REQUEST',
             })
         }
     }

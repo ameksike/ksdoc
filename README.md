@@ -1,4 +1,4 @@
-# KsDoc library 
+# KsDoc library series version 1.X.X
 KsDoc is a versatile library within the Ksike ecosystem, designed to streamline and simplify the documentation process for various application types, including CLI, web, and API development. This library integrates seamlessly with Swagger and JSDoc, harnessing their combined power to provide comprehensive and intuitive documentation.
 
 - **Unified Documentation:** KsDoc unifies the documentation process, catering to the diverse needs of CLI, web, and API applications.
