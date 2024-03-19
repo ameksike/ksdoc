@@ -12,7 +12,7 @@ const ContentService = require('./service/Content');
 const LanguageService = require('./service/Language');
 const ConfigService = require('./service/Config');
 const MenuService = require('./service/Menu');
-const SessionService = ksmf.monitor.Session;
+const SessionService = ksmf.server.Session;
 // utils 
 const formDataMw = require('./middleware/FormData');
 const { TConfig } = require('./types');
