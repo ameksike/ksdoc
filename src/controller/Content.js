@@ -261,7 +261,7 @@ class ContentController extends ksdp.integration.Dip {
                 scope: req.body.scope,
                 user_agent: req.body.user_agent || req.headers['user-agent'],
                 flow: req.flow
-            });
+            }, req, res);
             if (!payload) {
                 throw new Error('Authentication Failed');
             }
