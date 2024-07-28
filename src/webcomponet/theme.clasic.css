@@ -1,3 +1,35 @@
+:root {
+    --background-color: white;
+    --text-color: #212529;
+}
+
+[data-bs-theme="dark"] {
+    --background-color: #212529;
+    --text-color: white;
+}
+
+[data-bs-theme="blue"] {
+    --background-color: #001f3f;
+    --nav-color: #7FDBFF;
+    --text-color: #7FDBFF;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+.navbar {
+    background-color: var(--text-color);
+    color: var(--background-color);
+    a,span {
+        color: var(--background-color);
+        &:hover {
+            color: var(--background-color);
+        }
+    }
+}
+
 /* images */
 img {
     display: block;
@@ -92,4 +124,8 @@ p {
 }
 .hide {
     display: none;
+}
+
+theme-switcher {
+    margin-right: 0.5rem;
 }

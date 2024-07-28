@@ -170,13 +170,13 @@ class ContentService extends ksdp.integration.Dip {
             this.languageService?.load({ paths: this.path, schema, idiom }),
             dataSrv ? Promise.resolve(dataSrv) : this.dataService?.load({ name: pageid, schema, flow, token })
         ]);
-
         let data = {
             global: config?.global,
             title: config?.metadata?.name,
             version: config?.metadata?.version,
             description: config?.metadata?.description,
             environment: process?.env?.NODE_ENV,
+            idiom,
             lang,
             token,
             ...query,

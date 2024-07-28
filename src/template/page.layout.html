@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{lang}}">
+<html lang="{{idiom}}" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -22,12 +22,13 @@
 
 <body>
     <!-- NAV MENU -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-body" data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg border-bottom border-body">
         <div class="container-fluid d-none d-lg-block">
             <a class="navbar-brand" href="{{url.home}}">{{title}}</a>
         </div>
 
         <div class="container-fluid justify-content-end">
+            <theme-switcher data-store="theme" data-source="data-bs-theme"></theme-switcher>
             {% if account %}
                 <span class="navbar-brand">
                     {{lang.layout.welcome}}:
@@ -71,6 +72,7 @@
 
     <!-- SCRIPTS -->
     <script src="/ksdoc/code.view.js"></script>
+    <script src="/ksdoc/theme-switcher.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
@@ -78,6 +80,7 @@
         const details = document.querySelector("details");
         details?.setAttribute instanceof Function && details.setAttribute("open", "");
         CodeView?.register();
+        ThemeSwitcher?.register();
     </script>
     <!-- SCRIPTS CUSTOMIZED -->
     {{scripts}}
