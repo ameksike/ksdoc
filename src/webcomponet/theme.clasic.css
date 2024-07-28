@@ -28,6 +28,15 @@ body {
             color: var(--background-color);
         }
     }
+    span {
+        color: var(--background-color);
+    }
+    button {
+        border-color: var(--background-color);
+        span i {
+            color: var(--background-color);
+        }
+    }
 }
 
 /* images */
@@ -124,8 +133,4 @@ p {
 }
 .hide {
     display: none;
-}
-
-theme-switcher {
-    margin-right: 0.5rem;
 }
