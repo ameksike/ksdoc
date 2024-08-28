@@ -4,8 +4,10 @@
     --text-color: #212529;
     --bs-link-color: #0d6efd;
     --bs-link-hover-color: #0a58ca;
-    --bs-list-group-bg: white;
-    --bs-list-group-color: #212529
+    .list-group { 
+        --bs-list-group-bg: white;
+        --bs-list-group-color: #212529
+    }
 }
 
 [data-bs-theme="dark"] {
@@ -14,8 +16,10 @@
     --text-color: white;
     --bs-link-color: #7ca7e9;
     --bs-link-hover-color: #5983c2;
-    --bs-list-group-bg: #212529;
-    --bs-list-group-color:white;
+    .list-group { 
+        --bs-list-group-bg: #41444e;
+        --bs-list-group-color:white;
+    }
 }
 
 [data-bs-theme="blue"] {
@@ -25,8 +29,10 @@
     --text-color: #7FDBFF;
     --bs-link-color: #7FDBFF;
     --bs-link-hover-color: #6ecff6;
-    --bs-list-group-bg: white;
-    --bs-list-group-color: #212529
+    .list-group { 
+        --bs-list-group-bg: white;
+        --bs-list-group-color: #212529;
+    }
 }
 
 body {
